@@ -1,0 +1,99 @@
+I"*<p>This is a small guide on how to host your website or blog, created with jekyll static site generator, for free with 
+github. If you don’t know what jekyll is you can read about it <a href="https://jekyllrb.com/">here</a>.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+<h4 id="installation-and-requirements">Installation and requirements</h4>
+
+<p>Jekyll is written i Ruby and is a <a href="https://jekyllrb.com/docs/ruby-101/#gems">Ruby Gem</a> which can be installed on most systems.</p>
+
+<ul>
+  <li><a href="https://www.ruby-lang.org/en/downloads/">Ruby</a> version 2.5.0 or above, including all development headers (ruby version can be checked by running <code class="highlighter-rouge">ruby -v</code>)</li>
+  <li><a href="https://rubygems.org/pages/download">RubyGems</a> (which you can check by running <code class="highlighter-rouge">gem -v</code>)</li>
+  <li><a href="https://gcc.gnu.org/install/">GCC</a> and <a href="https://www.gnu.org/software/make/">Make</a> (in case your system doesn’t have them installed, which you can check by running <code class="highlighter-rouge">gcc -v</code>, <code class="highlighter-rouge">g++ -v</code> and <code class="highlighter-rouge">make -v</code> in your system’s command line interface)</li>
+</ul>
+
+<p>If you need a guide for the different operating systems, have a look <a href="https://jekyllrb.com/docs/installation/#requirements">here</a>.</p>
+
+<h2 id="instructions">Instructions</h2>
+
+<p>Open the terminal.</p>
+
+<p>1. Install Jekyll and bundler gems.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~ ❯ gem install jekyll bundler
+</code></pre></div></div>
+
+<p>2. Create a new Jekyll site at ./myblog.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~ ❯ jekyll new website
+</code></pre></div></div>
+
+<p>3. Change into your new directory.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~ ❯ cd website
+</code></pre></div></div>
+
+<p>4. Build the site and make it available on a local server.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/website ❯ bundle exec jekyll serve
+</code></pre></div></div>
+
+<p>5. Browse to <a href="http://localhost:4000">http://localhost:4000</a></p>
+
+<p>If you would like to run on a different port just add the port flag to the command line commands</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/website ❯ bundle exec jekyll serve --port 4001
+</code></pre></div></div>
+
+<p>Now browse to <a href="http://localhost:4001">http://localhost:4001</a></p>
+
+<h2 id="initialize-a-git-repo">Initialize a git repo</h2>
+
+<p>Now we have to initialize a git repo to be able to push it to github later.</p>
+
+<p>Open the terminal and go to your project folder.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~ ❯ cd website
+</code></pre></div></div>
+
+<p>We initialize a git repo be writing <code class="highlighter-rouge">git init</code></p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/website ❯ git init
+</code></pre></div></div>
+
+<h2 id="deployment">Deployment</h2>
+
+<p>If we are done modifying the project we add all changes, commit and push the code to your git repo that is prepared for github-pages. The git repo should be named like <code class="highlighter-rouge">username.github.io</code></p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/website ❯ git add -A 
+~/website ❯ git commit -m 'Initial commit'
+~/website ❯ git push origin master
+</code></pre></div></div>
+
+<p>After some time, browse to <code class="highlighter-rouge">username.github.io</code> and you will see your website or blog.</p>
+
+<h2 id="custom-domain">Custom domain</h2>
+
+<p>It is possible to point your github page <code class="highlighter-rouge">http://username.github.io</code> to your custom domain, <code class="highlighter-rouge">http://www.your-domain.com</code>. You do that by going to the <code class="highlighter-rouge">settings</code> link in your github repo.</p>
+
+<p><img src="/assets/images/screenshots/settings.png" alt="Github repo settings" /></p>
+
+<p>Go to the <code class="highlighter-rouge">GitHub Pages</code> section. There you will see <code class="highlighter-rouge">Custom domain</code> input field. Now add <code class="highlighter-rouge">www.your-domain.com</code> to the input field as seen in the picture below.</p>
+
+<p><img src="/assets/images/screenshots/settings_githubpage_http.png" alt="Github repo settings - Github Pages section - HTTP" /></p>
+
+<p>After a while you can access your website/blog via <code class="highlighter-rouge">http://www.your-domain.com</code></p>
+
+<h2 id="https">HTTPS</h2>
+
+<p>It’s a good idea to enable <code class="highlighter-rouge">https</code> to your site as well. It gives a more professional impression if you ask me.
+To enable <code class="highlighter-rouge">https</code> check the <code class="highlighter-rouge">Enforce HTTPS</code> filed seen in the picture below.</p>
+
+<p><img src="/assets/images/screenshots/settings_githubpage_https.png" alt="Github repo settings - Github Pages section - HTTPS" /></p>
+
+<h4 id="trubleshooting">Trubleshooting</h4>
+
+<p>If you only add <code class="highlighter-rouge">your-domain.com</code> without subdomain <code class="highlighter-rouge">www</code> in the <code class="highlighter-rouge">Custom domain</code> field 
+there may be problems accessing your website via <code class="highlighter-rouge">https</code>. To solve that you have to put subdomain <code class="highlighter-rouge">www</code> in the <code class="highlighter-rouge">Custom domain</code> field as well, as seen in the picture above.</p>
+
+:ET
