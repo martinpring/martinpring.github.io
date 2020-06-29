@@ -3,7 +3,7 @@ title_left    : "Martin"
 title_right   : "Pring" # default: ""
 description   : "Software Engineer, Entrepreneur and Product builder"
 keywords      : "Software Engineer, Saas, Startup, Java, Scala, Angular, React, Docker, nginx, Kubernetes, Jenkins, Android, iOS, macOs, Linux, Books"
-url           : http://martinpring.github.io # site url
+url           : https://martinpring.github.io # site url
 baseurl       : "" # apply repo name like "/myproject" if used under gh-pages branch, else (under master branch) just leave empty/blank
 cover         : "" # image uri like logo/cover image for site seo
 
