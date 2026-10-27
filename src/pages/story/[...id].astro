@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Base from '../../layouts/Base.astro';
+import Doc from '../../layouts/Doc.astro';
 
 export async function getStaticPaths() {
   const stories = await getCollection('story', ({ data }) => !data.draft);
@@ -12,61 +12,25 @@ const { Content } = await render(story);
 const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<Base title={story.data.title} description={story.data.description} type="article" published={story.data.date}>
-  <article class="wrap post">
-    <p class="back"><a href="/story">All stories</a></p>
+<Doc
+  title={story.data.title}
+  description={story.data.description}
+  path={`story\\${story.id}`}
+  type="article"
+  published={story.data.date}
+>
+  <article>
     <h1>{story.data.title}</h1>
-    <time datetime={story.data.date.toISOString()}>{dateFmt.format(story.data.date)}</time>
-    <div class="prose">
-      <Content />
-    </div>
+    <time class="mono" datetime={story.data.date.toISOString()}>{dateFmt.format(story.data.date)}</time>
+    <Content />
   </article>
-</Base>
+</Doc>
 
 <style>
-  .post {
-    max-width: calc(var(--measure) + 2 * var(--gutter));
-    padding-top: clamp(2rem, 6vw, 4rem);
-  }
-  .back {
-    font-size: var(--step--1);
-  }
-  h1 {
-    font-size: var(--step-3);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-  }
   time {
     display: block;
-    margin: 0.75rem 0 2.5rem;
-    color: var(--steel);
-  }
-  .prose :global(h2) {
-    font-size: var(--step-2);
-    letter-spacing: -0.02em;
-    margin: 2.5rem 0 1rem;
-  }
-  .prose :global(h3),
-  .prose :global(h4) {
-    font-size: var(--step-1);
-    margin: 2rem 0 0.75rem;
-  }
-  .prose :global(pre) {
-    background: var(--paper-raised);
-    border: 1px solid var(--rule);
-    border-radius: 6px;
-    padding: 1rem;
-    overflow-x: auto;
-    font-size: 0.85rem;
-  }
-  .prose :global(code) {
-    font-size: 0.9em;
-  }
-  .prose :global(img) {
-    border: 1px solid var(--rule);
-    border-radius: 6px;
-  }
-  .prose :global(li) {
-    margin-bottom: 0.4rem;
+    margin-bottom: 2.25rem;
+    font-size: 0.6875rem;
+    color: var(--faint);
   }
 </style>

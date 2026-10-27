@@ -1,0 +1,417 @@
+---
+// Illustrated "screens" for the CRT strip. Sized with container units so they scale with the card.
+import type { Screen } from '../projects';
+interface Props {
+  type: Screen;
+}
+const { type } = Astro.props;
+
+const uptime = Array.from({ length: 30 }, (_, i) => (i === 17 ? 'warn' : 'ok'));
+---
+
+<div class={`scr scr-${type}`}>
+  {
+    type === 'quote' && (
+      <div class="phone">
+        <div class="bar">
+          <b>Offert #1042</b>
+          <span class="pill">utkast</span>
+        </div>
+        <p class="sub">Elinstallation, kök · Andersson</p>
+        <ul class="lines">
+          <li>
+            <span>Arbete 6 h</span>
+            <span>3 900 kr</span>
+          </li>
+          <li>
+            <span>Jordfelsbrytare</span>
+            <span>1 250 kr</span>
+          </li>
+          <li>
+            <span>Kabel 25 m</span>
+            <span>620 kr</span>
+          </li>
+          <li>
+            <span>ROT-avdrag</span>
+            <span>−1 170 kr</span>
+          </li>
+        </ul>
+        <div class="total">
+          <span>Att betala</span>
+          <b>4 600 kr</b>
+        </div>
+        <span class="cta">Skicka offert</span>
+        <span class="ai">✦ Skapad från röstmemo</span>
+      </div>
+    )
+  }
+
+  {
+    type === 'status' && (
+      <div class="board">
+        <div class="bar">
+          <b>Real Logic</b>
+          <span class="ok-pill">All systems operational</span>
+        </div>
+        {['gateway', 'booking-api', 'integration-hub', 'event-stream'].map((s, n) => (
+          <div class="svc">
+            <span>{s}</span>
+            <span class="pct">{['99.99', '99.98', '100.0', '99.99'][n]}%</span>
+            <div class="ticks">
+              {uptime.map((u, i) => (
+                <i class={n === 1 && i === 17 ? 'warn' : 'ok'} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    type === 'integration' && (
+      <div class="flow">
+        <div class="node">
+          1177
+          <small>invånartjänst</small>
+        </div>
+        <div class="wire">
+          <span>FHIR</span>
+        </div>
+        <div class="node hub">
+          NTjP
+          <small>tjänsteplattform</small>
+        </div>
+        <div class="wire">
+          <span>HL7</span>
+        </div>
+        <div class="node">
+          Vårdsystem
+          <small>region</small>
+        </div>
+        <pre>
+          GET /Patient/123/Appointment{'\n'}200 OK · 84 ms
+        </pre>
+      </div>
+    )
+  }
+
+  {
+    type === 'departures' && (
+      <div class="deps">
+        <div class="bar">
+          <b>Avgångar</b>
+          <span>Resecentrum</span>
+        </div>
+        {[
+          ['1', 'Centrum', 'Nu'],
+          ['3', 'Universitetet', '2 min'],
+          ['900', 'Göteborg', '14:05'],
+          ['16', 'Hamnen', '6 min'],
+          ['RE', 'Oslo S', '14:22'],
+        ].map(([l, d, t]) => (
+          <div class="row">
+            <span class="line">{l}</span>
+            <span>{d}</span>
+            <span class="t">{t}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    type === 'lab' && (
+      <div class="lab">
+        <div class="bar">
+          <b>Provsvar</b>
+          <span>Signerat</span>
+        </div>
+        {[
+          ['Hb', '142', 'g/L', '117–153'],
+          ['CRP', '<5', 'mg/L', '<5'],
+          ['Glukos', '5.4', 'mmol/L', '4.0–6.0'],
+          ['TSH', '2.1', 'mIE/L', '0.4–4.0'],
+          ['Ferritin', '18', 'µg/L', '15–200'],
+        ].map((r) => (
+          <div class="row">
+            {r.map((c) => (
+              <span>{c}</span>
+            ))}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    type === 'story' && (
+      <div class="article">
+        <small>martinpring.com/story</small>
+        <h4>Notes from building software, products and companies</h4>
+        <p />
+        <p />
+        <p class="short" />
+        <code>~ ❯ npm run build</code>
+        <p />
+        <p class="short" />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .scr {
+    position: absolute;
+    inset: 0;
+    background: #ebe9e4;
+    color: #1d1c1a;
+    font-family: var(--sans);
+    font-size: 3.1cqw;
+    line-height: 1.35;
+    padding: 6cqw 7cqw;
+    overflow: hidden;
+  }
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 3cqw;
+  }
+  .bar b {
+    font-size: 4.6cqw;
+    letter-spacing: -0.02em;
+  }
+  .bar span {
+    color: #6b6862;
+  }
+
+  /* quote */
+  .scr-quote {
+    background: radial-gradient(120% 90% at 50% 0%, #f4efe2, #e2ddd2);
+    display: grid;
+    place-items: center;
+    padding: 4cqw;
+  }
+  .phone {
+    width: 56cqw;
+    background: #fff;
+    border-radius: 3cqw;
+    padding: 4.5cqw;
+    box-shadow: 0 2cqw 6cqw rgba(0, 0, 0, 0.18);
+    font-size: 2.8cqw;
+  }
+  .phone .bar b {
+    font-size: 4cqw;
+  }
+  .pill {
+    font-size: 2.4cqw;
+    background: #f0e6c4;
+    color: #6d5a1b !important;
+    padding: 0.3cqw 1.6cqw;
+    border-radius: 9cqw;
+  }
+  .sub {
+    margin: -1.5cqw 0 3cqw;
+    color: #77736b;
+  }
+  .lines {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .lines li,
+  .total {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.2cqw 0;
+    border-bottom: 1px solid #ece9e2;
+  }
+  .total {
+    border: 0;
+    margin-top: 1.5cqw;
+    font-size: 3.4cqw;
+  }
+  .cta {
+    display: block;
+    text-align: center;
+    background: #1d1c1a;
+    color: #fff;
+    border-radius: 2cqw;
+    padding: 2.2cqw;
+    margin-top: 2.5cqw;
+    font-weight: 600;
+  }
+  .ai {
+    display: block;
+    text-align: center;
+    margin-top: 2cqw;
+    color: #8a7a3f;
+    font-size: 2.4cqw;
+  }
+
+  /* status */
+  .ok-pill {
+    color: #2c7a4d !important;
+    font-size: 2.8cqw;
+  }
+  .svc {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1cqw;
+    margin-top: 3cqw;
+    font-family: var(--mono);
+    font-size: 2.6cqw;
+  }
+  .pct {
+    color: #6b6862;
+  }
+  .ticks {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(30, 1fr);
+    gap: 0.5cqw;
+    height: 5cqw;
+  }
+  .ticks i {
+    background: #3e9b66;
+    border-radius: 0.3cqw;
+  }
+  .ticks i.warn {
+    background: #d6a93c;
+  }
+
+  /* integration */
+  .scr-integration {
+    background: #f1f0ec;
+    background-image: radial-gradient(#d6d3cc 1px, transparent 1px);
+    background-size: 3.2cqw 3.2cqw;
+  }
+  .flow {
+    display: grid;
+    grid-template-columns: 1fr 0.7fr 1fr 0.7fr 1fr;
+    align-items: center;
+    height: 100%;
+    gap: 0;
+  }
+  .node {
+    background: #fff;
+    border: 1px solid #cfccc4;
+    border-radius: 1.6cqw;
+    padding: 3cqw 1.5cqw;
+    text-align: center;
+    font-weight: 600;
+    font-size: 3.2cqw;
+  }
+  .node small {
+    display: block;
+    font-weight: 400;
+    color: #77736b;
+    font-size: 2.3cqw;
+  }
+  .node.hub {
+    background: #1d1c1a;
+    color: #fff;
+    border-color: #1d1c1a;
+  }
+  .node.hub small {
+    color: #b9b5ad;
+  }
+  .wire {
+    height: 1px;
+    background: #8f8b83;
+    position: relative;
+  }
+  .wire span {
+    position: absolute;
+    left: 50%;
+    top: -4.2cqw;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 2.3cqw;
+    color: #6b6862;
+  }
+  .flow pre {
+    grid-column: 1 / -1;
+    align-self: end;
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 2.4cqw;
+    background: #1d1c1a;
+    color: #c9e3cf;
+    padding: 2.4cqw 3cqw;
+    border-radius: 1.4cqw;
+    white-space: pre-wrap;
+  }
+
+  /* departures */
+  .scr-departures {
+    background: #10223a;
+    color: #f2d36b;
+    font-family: var(--mono);
+  }
+  .scr-departures .bar span {
+    color: #9fb0c6;
+  }
+  .deps .row {
+    display: grid;
+    grid-template-columns: 9cqw 1fr auto;
+    gap: 3cqw;
+    padding: 2cqw 0;
+    border-bottom: 1px solid #22395a;
+    font-size: 3.2cqw;
+  }
+  .line {
+    background: #f2d36b;
+    color: #10223a;
+    text-align: center;
+    border-radius: 0.8cqw;
+    font-weight: 700;
+  }
+  .t {
+    color: #fff;
+  }
+
+  /* lab */
+  .lab .row {
+    display: grid;
+    grid-template-columns: 1.3fr 0.8fr 1fr 1.1fr;
+    padding: 1.8cqw 0;
+    border-bottom: 1px solid #d6d3cc;
+    font-variant-numeric: tabular-nums;
+  }
+  .lab .row span:nth-child(n + 3) {
+    color: #77736b;
+  }
+
+  /* story */
+  .article small {
+    font-family: var(--mono);
+    color: #8a867e;
+  }
+  .article h4 {
+    font-size: 6cqw;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin: 2cqw 0 4cqw;
+    max-width: 80%;
+  }
+  .article p {
+    height: 1.8cqw;
+    background: #d3d0c9;
+    border-radius: 1cqw;
+    margin: 0 0 2cqw;
+  }
+  .article p.short {
+    width: 62%;
+  }
+  .article code {
+    display: block;
+    background: #1d1c1a;
+    color: #d8d4cc;
+    font-family: var(--mono);
+    padding: 2.4cqw 3cqw;
+    border-radius: 1.2cqw;
+    margin: 3cqw 0;
+  }
+</style>

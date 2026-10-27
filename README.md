@@ -14,11 +14,19 @@ npm run build    # static output in dist/
 
 | What | Where |
 |---|---|
-| Shared facts (email, links, career start year) | `src/site.ts` |
-| Home page | `src/pages/index.astro` |
+| Shared facts (email, links) | `src/site.ts` |
+| Home page (ticker, intro, logo grid, CRT work strip) | `src/pages/index.astro` |
+| Work strip items and logo-grid tiles | `src/projects.ts` |
+| Drawn placeholder screens for the work strip | `src/components/Screen.astro` |
+| Privacy page | `src/pages/privacy.astro` |
 | Stories (blog posts) | `src/content/story/*.md`, served at `/story/<file-name>` |
 | Global styles and colour tokens | `src/styles/global.css` |
 | Static files (favicons, `CNAME`, images) | `public/` |
+
+## Using real screenshots in the work strip
+
+Put the image in `public/images/work/` (4:3 works best, e.g. 1200×900) and add
+`image: '/images/work/<file>'` to that project in `src/projects.ts`. It replaces the drawn screen.
 
 ## Writing a story
 

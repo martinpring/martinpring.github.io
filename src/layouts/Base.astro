@@ -13,14 +13,6 @@ const { title, description = SITE.description, type = 'website', published } = A
 const fullTitle = title ? `${title} | ${SITE.name}` : SITE.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL('/images/og.png', Astro.site);
-const path = Astro.url.pathname.replace(/\/$/, '');
-
-const nav = [
-  { href: '/#work', label: 'Work' },
-  { href: '/#building', label: 'Building' },
-  { href: '/story', label: 'Story' },
-  { href: '/#contact', label: 'Contact' },
-];
 
 const person = {
   '@context': 'https://schema.org',
@@ -43,8 +35,7 @@ const person = {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#eef2f1" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#101c25" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#181716" />
 
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
@@ -59,90 +50,135 @@ const person = {
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — Story`} href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name}, story`} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <script type="application/ld+json" set:html={JSON.stringify(person)} />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <header class="site-header wrap">
-      <a class="brand" href="/" aria-label="Martin Pring, home">Martin Pring</a>
-      <nav aria-label="Main">
-        <ul>
-          {
-            nav.map((item) => (
-              <li>
-                <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
-                  {item.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-    </header>
+    <slot />
 
-    <main id="main">
-      <slot />
-    </main>
+    <!-- Crosshair cursor with coordinate readout (fine pointers only) -->
+    <div class="xhair" aria-hidden="true">
+      <span class="xh-x"></span>
+      <span class="xh-y"></span>
+      <span class="xh-label mono"></span>
+    </div>
 
-    <footer class="site-footer wrap rule-top">
-      <p>
-        © {new Date().getFullYear()} Martin Pring. Consulting through Real Logic AB, Sweden.
-      </p>
-      <ul>
-        <li><a href={`mailto:${SITE.email}`}>Email</a></li>
-        <li><a href={SITE.links.linkedin} rel="me">LinkedIn</a></li>
-        <li><a href={SITE.links.github} rel="me">GitHub</a></li>
-        <li><a href="/rss.xml">RSS</a></li>
-      </ul>
-    </footer>
+    <script>
+      // ---------- crosshair ----------
+      const root = document.querySelector<HTMLElement>('.xhair');
+      const label = root?.querySelector<HTMLElement>('.xh-label');
+      const fine = window.matchMedia('(pointer: fine)').matches;
+      if (root && label && fine) {
+        let raf = 0;
+        let x = 0;
+        let y = 0;
+        const draw = () => {
+          raf = 0;
+          root.style.setProperty('--x', `${x}px`);
+          root.style.setProperty('--y', `${y}px`);
+          label.textContent = `X: ${Math.round(x)}   Y: ${Math.round(y)}`;
+        };
+        window.addEventListener(
+          'pointermove',
+          (e) => {
+            x = e.clientX;
+            y = e.clientY;
+            root.classList.add('on');
+            if (!raf) raf = requestAnimationFrame(draw);
+          },
+          { passive: true },
+        );
+        document.documentElement.addEventListener('pointerleave', () => root.classList.remove('on'));
+      }
+
+      // ---------- sound (off by default, synthesized ticks, no files) ----------
+      const KEY = 'mp-sound';
+      let on = false;
+      try {
+        on = localStorage.getItem(KEY) === 'on';
+      } catch {}
+      let ctx: AudioContext | null = null;
+      const tick = (freq = 1800, dur = 0.035, gain = 0.035) => {
+        if (!on) return;
+        ctx ??= new AudioContext();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'square';
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(gain, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+        o.connect(g).connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + dur);
+      };
+      const render = () => {
+        document.querySelectorAll<HTMLButtonElement>('[data-sound-toggle]').forEach((b) => {
+          b.setAttribute('aria-pressed', String(on));
+          const t = b.querySelector('[data-sound-label]');
+          if (t) t.textContent = on ? 'sounds on' : 'sounds off';
+        });
+      };
+      render();
+      document.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest('[data-sound-toggle]');
+        if (b) {
+          on = !on;
+          try {
+            localStorage.setItem(KEY, on ? 'on' : 'off');
+          } catch {}
+          render();
+          tick(on ? 1200 : 600, 0.06);
+        }
+      });
+      document.addEventListener('pointerover', (e) => {
+        const t = (e.target as HTMLElement).closest('a, button, [data-tick]');
+        if (t && !t.contains(e.relatedTarget as Node)) tick();
+      });
+    </script>
+
+    <style>
+      .xhair {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 40;
+        opacity: 0;
+        transition: opacity 200ms;
+      }
+      .xhair:global(.on) {
+        opacity: 1;
+      }
+      .xh-x,
+      .xh-y {
+        position: absolute;
+        background: rgba(216, 212, 204, 0.06);
+      }
+      .xh-x {
+        left: 0;
+        right: 0;
+        height: 1px;
+        transform: translateY(var(--y));
+      }
+      .xh-y {
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        transform: translateX(var(--x));
+      }
+      .xh-label {
+        position: absolute;
+        transform: translate(calc(var(--x) + 14px), calc(var(--y) + 14px));
+        font-size: 0.625rem;
+        color: var(--muted);
+        white-space: pre;
+      }
+      @media (pointer: coarse) {
+        .xhair {
+          display: none;
+        }
+      }
+    </style>
   </body>
 </html>
-
-<style>
-  .site-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.5rem 1.5rem;
-    padding-block: 1.5rem;
-  }
-  .brand {
-    font-weight: 750;
-    letter-spacing: -0.01em;
-    text-decoration: none;
-  }
-  nav ul,
-  .site-footer ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 1.25rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  nav a {
-    color: var(--steel);
-    text-decoration: none;
-  }
-  nav a:hover,
-  nav a[aria-current='page'] {
-    color: var(--ink);
-    text-decoration: underline;
-  }
-  .site-footer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 1rem 2rem;
-    padding-block: 2.5rem 3rem;
-    margin-top: clamp(4rem, 10vw, 7rem);
-    color: var(--steel);
-    font-size: var(--step--1);
-  }
-  .site-footer p {
-    margin: 0;
-  }
-</style>

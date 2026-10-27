@@ -10,6 +10,4 @@ export const SITE = {
     github: 'https://github.com/martinpring',
     tradesnap: 'https://tradesnaphq.com/',
   },
-  // Start of professional career, used by the uptime strip in the hero.
-  careerStart: { year: 2013, month: 1 },
 };
