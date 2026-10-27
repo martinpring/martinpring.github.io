@@ -96,7 +96,6 @@ const person = {
 
       // ---------- text scramble on hover/focus ----------
       // Elements marked [data-scramble] cycle through random glyphs and settle left to right.
-      // A [data-scramble-host] ancestor (e.g. a tile) triggers all [data-scramble] inside it.
       const GLYPHS = '!<>-_/[]{}=+*^?#%01ABCDEFGHJKLMNPQRSTUVWXYZabcdefghkmnpqrstuvwxyz';
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const running = new WeakSet<HTMLElement>();
@@ -129,12 +128,6 @@ const person = {
       };
       const trigger = (e: Event) => {
         const target = e.target as HTMLElement;
-        const host = target.closest<HTMLElement>('[data-scramble-host]');
-        if (host) {
-          if (e.type === 'pointerover' && host.contains((e as PointerEvent).relatedTarget as Node)) return;
-          host.querySelectorAll<HTMLElement>('[data-scramble]').forEach(scramble);
-          return;
-        }
         const el = target.closest<HTMLElement>('[data-scramble]');
         if (!el) return;
         if (e.type === 'pointerover' && el.contains((e as PointerEvent).relatedTarget as Node)) return;
