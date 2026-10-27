@@ -47,7 +47,8 @@ const person = {
     {published && <meta property="article:published_time" content={published.toISOString()} />}
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title={`${SITE.name}, story`} href="/rss.xml" />
@@ -93,49 +94,54 @@ const person = {
         document.documentElement.addEventListener('pointerleave', () => root.classList.remove('on'));
       }
 
-      // ---------- sound (off by default, synthesized ticks, no files) ----------
-      const KEY = 'mp-sound';
-      let on = false;
-      try {
-        on = localStorage.getItem(KEY) === 'on';
-      } catch {}
-      let ctx: AudioContext | null = null;
-      const tick = (freq = 1800, dur = 0.035, gain = 0.035) => {
-        if (!on) return;
-        ctx ??= new AudioContext();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'square';
-        o.frequency.value = freq;
-        g.gain.setValueAtTime(gain, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
-        o.connect(g).connect(ctx.destination);
-        o.start();
-        o.stop(ctx.currentTime + dur);
+      // ---------- text scramble on hover/focus ----------
+      // Elements marked [data-scramble] cycle through random glyphs and settle left to right.
+      // A [data-scramble-host] ancestor (e.g. a tile) triggers all [data-scramble] inside it.
+      const GLYPHS = '!<>-_/[]{}=+*^?#%01ABCDEFGHJKLMNPQRSTUVWXYZabcdefghkmnpqrstuvwxyz';
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const running = new WeakSet<HTMLElement>();
+      const scramble = (el: HTMLElement) => {
+        if (reduce || running.has(el)) return;
+        const text = (el.dataset.text ??= el.textContent ?? '');
+        if (!text.trim()) return;
+        if (!el.hasAttribute('aria-label') && !el.closest('[aria-label]')) el.setAttribute('aria-label', text);
+        running.add(el);
+        el.style.minWidth = `${el.getBoundingClientRect().width}px`;
+        const dur = Math.min(650, 220 + text.length * 22);
+        const settle = [...text].map((_, i) => (i / text.length) * dur * 0.75 + Math.random() * dur * 0.25);
+        const t0 = performance.now();
+        const frame = (now: number) => {
+          const t = now - t0;
+          let out = '';
+          for (let i = 0; i < text.length; i++) {
+            const c = text[i];
+            out += /\s/.test(c) || t >= settle[i] ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          }
+          el.textContent = out;
+          if (t < dur) requestAnimationFrame(frame);
+          else {
+            el.textContent = text;
+            el.style.minWidth = '';
+            running.delete(el);
+          }
+        };
+        requestAnimationFrame(frame);
       };
-      const render = () => {
-        document.querySelectorAll<HTMLButtonElement>('[data-sound-toggle]').forEach((b) => {
-          b.setAttribute('aria-pressed', String(on));
-          const t = b.querySelector('[data-sound-label]');
-          if (t) t.textContent = on ? 'sounds on' : 'sounds off';
-        });
-      };
-      render();
-      document.addEventListener('click', (e) => {
-        const b = (e.target as HTMLElement).closest('[data-sound-toggle]');
-        if (b) {
-          on = !on;
-          try {
-            localStorage.setItem(KEY, on ? 'on' : 'off');
-          } catch {}
-          render();
-          tick(on ? 1200 : 600, 0.06);
+      const trigger = (e: Event) => {
+        const target = e.target as HTMLElement;
+        const host = target.closest<HTMLElement>('[data-scramble-host]');
+        if (host) {
+          if (e.type === 'pointerover' && host.contains((e as PointerEvent).relatedTarget as Node)) return;
+          host.querySelectorAll<HTMLElement>('[data-scramble]').forEach(scramble);
+          return;
         }
-      });
-      document.addEventListener('pointerover', (e) => {
-        const t = (e.target as HTMLElement).closest('a, button, [data-tick]');
-        if (t && !t.contains(e.relatedTarget as Node)) tick();
-      });
+        const el = target.closest<HTMLElement>('[data-scramble]');
+        if (!el) return;
+        if (e.type === 'pointerover' && el.contains((e as PointerEvent).relatedTarget as Node)) return;
+        scramble(el);
+      };
+      document.addEventListener('pointerover', trigger);
+      document.addEventListener('focusin', trigger);
     </script>
 
     <style>

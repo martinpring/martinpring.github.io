@@ -28,7 +28,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
           <img src="/images/mp.png" alt="" width="44" height="44" />
           <div>
             <h1 class="name">Martin Pring</h1>
-            <p class="role">Founder &amp; CEO, Real Logic</p>
+            <p class="role">Co-Founder @ Tradesnap</p>
           </div>
           <div class="where mono">
             <time data-clock>{clockFmt.format(new Date())}</time>
@@ -37,25 +37,25 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
         </div>
 
         <p class="blurb">
-          I help teams in <b>healthcare, transport and logistics</b> ship <b>backends and integrations</b> that stay up.
-          Co-founder of Tradesnap.<br />
-          <a class="more" href={SITE.links.tradesnap}>see what I’m building.</a>
+          I help teams in <b>healthcare, transport and logistics</b> build <b>resilient systems</b>. Co-founder of
+          Tradesnap.<br />
+          <a class="more" href={SITE.links.tradesnap} data-scramble>see what I’m building.</a>
         </p>
 
         <h2 class="headline">building resilient systems for industries that can’t afford downtime</h2>
 
         <p class="actions">
-          <a class="btn btn-solid" href={`mailto:${SITE.email}`}>email me</a>
-          <a class="btn btn-ghost" href={SITE.links.linkedin} rel="me">linkedin</a>
+          <a class="btn btn-solid" href={`mailto:${SITE.email}`} data-scramble>email me</a>
+          <a class="btn btn-ghost" href={SITE.links.linkedin} rel="me" data-scramble>linkedin</a>
         </p>
       </div>
 
       <ul class="marks" aria-label="Companies and organisations I work with">
         {
           MARKS.map((m) => (
-            <li class={m.style} data-tick>
-              <span class="mark-note mono">{m.note}</span>
-              <span class="mark-name">{m.name}</span>
+            <li class={m.style} data-scramble-host>
+              <span class="mark-note mono" data-scramble>{m.note}</span>
+              <span class="mark-name" data-scramble>{m.name}</span>
             </li>
           ))
         }
@@ -76,8 +76,8 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
       <ul class="strip" tabindex="0" aria-label="Work">
         {
           PROJECTS.map((p) => (
-            <li class="card" data-id={p.id}>
-              <span class="tag mono" aria-hidden="true">{p.name}</span>
+            <li class="card" data-id={p.id} data-scramble-host>
+              <span class="tag mono" aria-hidden="true" data-scramble>{p.name}</span>
               <div class="crt" aria-hidden="true">
                 {p.image ? <img src={p.image} alt="" loading="lazy" /> : <Screen type={p.screen} />}
                 <span class="info mono">i</span>
@@ -98,7 +98,20 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
         <article data-for={p.id} hidden>
           <p class="sheet-role mono">{p.role}</p>
           <h3 id={`sheet-${p.id}`}>{p.name}</h3>
-          <p>{p.summary}</p>
+          {(p.body ?? [p.summary]).map((b) =>
+            typeof b === 'string' ? (
+              <p>{b}</p>
+            ) : (
+              <div class="howto">
+                <p class="howto-head">{b.heading}</p>
+                <ul>
+                  {b.items.map((i) => (
+                    <li>{i}</li>
+                  ))}
+                </ul>
+              </div>
+            ),
+          )}
           <ul class="chips mono">
             {p.stack.map((s) => (
               <li>{s}</li>
@@ -106,7 +119,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
           </ul>
           {p.href && (
             <p>
-              <a class="btn btn-solid" href={p.href}>
+              <a class="btn btn-solid" href={p.href} data-scramble>
                 {p.linkLabel}
               </a>
             </p>
@@ -116,7 +129,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
     }
     <span id="sheet-title" class="visually-hidden">Project details</span>
     <form method="dialog">
-      <button class="close mono" type="submit">[ close ]</button>
+      <button class="close mono" type="submit" data-scramble>[ close ]</button>
     </form>
   </dialog>
 </Base>
@@ -673,6 +686,22 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
   .sheet::backdrop {
     background: rgba(10, 10, 9, 0.7);
     backdrop-filter: blur(2px);
+  }
+  .sheet {
+    max-height: min(44rem, calc(100dvh - 4rem));
+    overflow-y: auto;
+  }
+  .howto-head {
+    margin: 0 0 0.35rem;
+    color: var(--text) !important;
+  }
+  .howto ul {
+    margin: 0 0 1rem;
+    padding-left: 1.1rem;
+    color: #b8b3aa;
+  }
+  .howto li {
+    margin-bottom: 0.35rem;
   }
   .sheet h3 {
     margin: 0.2rem 0 0.75rem;

@@ -8,7 +8,7 @@ export default defineConfig({
   integrations: [sitemap()],
   redirects: {
     // Old Jekyll permalinks (/:year/:title/)
-    '/2020/how-to-set-up-a-jekyll-blog-and-host-it-on-github': '/story/how-to-set-up-a-jekyll-blog-and-host-it-on-github',
+    '/2020/how-to-set-up-a-jekyll-blog-and-host-it-on-github': '/story',
     '/about': '/',
   },
 });
