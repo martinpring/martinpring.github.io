@@ -1,0 +1,157 @@
+@import '@fontsource-variable/schibsted-grotesk';
+
+:root {
+  --paper: #eef2f1;
+  --paper-raised: #f7f9f8;
+  --ink: #13212c;
+  --steel: #56677a;
+  --rule: #cdd6da;
+  --ok: #1f8a5b;
+  --ok-soft: #b9dccb;
+  --focus: #2b6cb0;
+
+  --font: 'Schibsted Grotesk Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Modular scale, ratio 1.25 from 18px body */
+  --step--1: 0.889rem;
+  --step-0: 1.125rem;
+  --step-1: 1.406rem;
+  --step-2: 1.758rem;
+  --step-3: 2.197rem;
+  --step-5: clamp(2.6rem, 6.4vw, 4.6rem);
+
+  --measure: 64ch;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --wide: 72rem;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #101c25;
+    --paper-raised: #162530;
+    --ink: #e4eaec;
+    --steel: #93a3b1;
+    --rule: #2a3b47;
+    --ok: #3fbf86;
+    --ok-soft: #22503c;
+    --focus: #7fb3ea;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --paper: #101c25;
+  --paper-raised: #162530;
+  --ink: #e4eaec;
+  --steel: #93a3b1;
+  --rule: #2a3b47;
+  --ok: #3fbf86;
+  --ok-soft: #22503c;
+  --focus: #7fb3ea;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0 0 1em;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--steel);
+}
+a:hover {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hairline aligned to the content edge, not the viewport gutter */
+.rule-top {
+  background: linear-gradient(var(--rule), var(--rule)) no-repeat center top / calc(100% - 2 * var(--gutter)) 1px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wide);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.skip {
+  position: absolute;
+  left: -999px;
+}
+.skip:focus {
+  left: var(--gutter);
+  top: 0.75rem;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.5rem 0.75rem;
+  z-index: 10;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

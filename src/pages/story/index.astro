@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const stories = (await getCollection('story', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<Base title="Story" description="Notes from building software, products and companies.">
+  <div class="wrap page">
+    <h1>Story</h1>
+    <p class="lede">Notes from building software, products and companies.</p>
+    <ul>
+      {
+        stories.map((s) => (
+          <li>
+            <a href={`/story/${s.id}`}>{s.data.title}</a>
+            <p>{s.data.description}</p>
+            <time datetime={s.data.date.toISOString()}>{dateFmt.format(s.data.date)}</time>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .page {
+    max-width: calc(var(--measure) + 2 * var(--gutter));
+    padding-top: clamp(2rem, 6vw, 4rem);
+  }
+  h1 {
+    font-size: var(--step-3);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .lede {
+    color: var(--steel);
+    margin: 0.75rem 0 2.5rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+  li {
+    padding-block: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  li a {
+    font-size: var(--step-1);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  li p {
+    margin: 0.35rem 0;
+  }
+  time {
+    color: var(--steel);
+    font-size: var(--step--1);
+  }
+</style>

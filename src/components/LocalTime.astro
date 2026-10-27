@@ -1,0 +1,36 @@
+---
+// Live clock for Sweden. Server-renders the build-time value, then ticks in the browser.
+const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
+---
+
+<p class="local-time">
+  In Sweden it’s <time data-clock>{fmt.format(new Date())}</time>
+</p>
+
+<script>
+  const el = document.querySelector<HTMLTimeElement>('[data-clock]');
+  if (el) {
+    const fmt = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Stockholm',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const tick = () => {
+      el.textContent = fmt.format(new Date());
+    };
+    tick();
+    setInterval(tick, 15_000);
+  }
+</script>
+
+<style>
+  .local-time {
+    margin: 0;
+    color: var(--steel);
+    font-size: var(--step--1);
+  }
+  time {
+    color: var(--ink);
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,275 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import UptimeStrip from '../components/UptimeStrip.astro';
+import LocalTime from '../components/LocalTime.astro';
+import { SITE } from '../site';
+
+const stories = (await getCollection('story', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+
+const services = [
+  {
+    term: 'Backend and integrations',
+    detail:
+      'Java and Spring Boot services, Apache Camel routes, REST and SOAP APIs. Built to keep working when the system on the other side doesn’t.',
+  },
+  {
+    term: 'Platform and delivery',
+    detail: 'OpenShift, Kubernetes and Docker, with CI/CD pipelines that make a release on a Tuesday afternoon unremarkable.',
+  },
+  {
+    term: 'Regulated domains',
+    detail:
+      'Swedish e-health infrastructure (NTjP, FHIR, HL7) and public-sector integration, where compliance is part of the design rather than a review at the end.',
+  },
+  {
+    term: 'Frontend when it’s needed',
+    detail: 'Angular and TypeScript, so one person can carry a feature from the database to the screen.',
+  },
+];
+
+const clients = [
+  { name: 'Inera', note: '1177 e-health services' },
+  { name: 'Samtrafiken', note: 'Public transport middleware' },
+  { name: 'Nordic Medtest', note: 'Healthcare' },
+  { name: 'LearningWell', note: 'Consulting' },
+];
+---
+
+<Base>
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <LocalTime />
+    <h1 id="hero-title">I build systems for industries that can’t afford downtime.</h1>
+    <p class="lede">
+      Founder and CEO of Real Logic. I design and build backends and integrations for Swedish healthcare, public
+      transport and logistics. I’m also co-founding Tradesnap, a mobile-first app for trade businesses.
+    </p>
+    <p class="actions">
+      <a class="button" href={`mailto:${SITE.email}`}>Email me</a>
+      <a href={SITE.links.linkedin} rel="me">Connect on LinkedIn</a>
+    </p>
+    <UptimeStrip />
+  </section>
+
+  <section id="work" class="section wrap rule-top" aria-labelledby="work-title">
+    <h2 id="work-title">Work</h2>
+    <div class="body">
+      <p class="intro">
+        I take on consulting assignments through Real Logic, either long engagements inside a team or a focused piece of
+        work: an integration that has to land, a platform move, a second opinion on architecture.
+      </p>
+      <dl class="services">
+        {
+          services.map((s) => (
+            <div>
+              <dt>{s.term}</dt>
+              <dd>{s.detail}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <h3>Selected clients</h3>
+      <ul class="clients">
+        {
+          clients.map((c) => (
+            <li>
+              <strong>{c.name}</strong>
+              <span>{c.note}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section id="building" class="section wrap rule-top" aria-labelledby="building-title">
+    <h2 id="building-title">Building</h2>
+    <div class="body">
+      <article class="product">
+        <h3>Tradesnap</h3>
+        <p>
+          A mobile-first, AI-native app for trade businesses. Electricians, plumbers and builders write quotes and send
+          invoices from their phone, so the admin is done before they leave the job instead of late at night.
+        </p>
+        <p>I co-founded it and wrote most of the first version.</p>
+        <p><a href={SITE.links.tradesnap}>Visit tradesnaphq.com</a></p>
+      </article>
+    </div>
+  </section>
+
+  {
+    stories.length > 0 && (
+      <section id="story" class="section wrap rule-top" aria-labelledby="story-title">
+        <h2 id="story-title">Story</h2>
+        <div class="body">
+          <ul class="story-list">
+            {stories.map((s) => (
+              <li>
+                <a href={`/story/${s.id}`}>{s.data.title}</a>
+                <time datetime={s.data.date.toISOString()}>{dateFmt.format(s.data.date)}</time>
+              </li>
+            ))}
+          </ul>
+          <p>
+            <a href="/story">All stories</a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  <section id="off" class="section wrap rule-top" aria-labelledby="off-title">
+    <h2 id="off-title">Off the clock</h2>
+    <div class="body">
+      <p>Board member at Melbie Group. Academy coach for the U13 to U15 teams at IF Karlstad Fotboll.</p>
+    </div>
+  </section>
+
+  <section id="contact" class="section wrap rule-top" aria-labelledby="contact-title">
+    <h2 id="contact-title">Contact</h2>
+    <div class="body contact">
+      <img src="/images/mp.png" alt="Martin Pring" width="96" height="96" loading="lazy" />
+      <div>
+        <p>Email is the quickest way to reach me.</p>
+        <p class="actions">
+          <a class="button" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          <a href={SITE.links.linkedin} rel="me">LinkedIn</a>
+          <a href={SITE.links.github} rel="me">GitHub</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 1.5rem;
+    padding-top: clamp(2rem, 8vw, 6rem);
+    padding-bottom: clamp(3rem, 8vw, 5rem);
+  }
+  h1 {
+    font-size: var(--step-5);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+    max-width: 15ch;
+  }
+  .lede {
+    font-size: var(--step-1);
+    line-height: 1.45;
+    max-width: 44ch;
+    color: var(--steel);
+    margin: 0;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin: 0 0 1.5rem;
+  }
+  .button {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.7rem 1.15rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .button:hover {
+    background: color-mix(in srgb, var(--ink) 82%, var(--ok));
+  }
+
+  .section {
+    display: grid;
+    gap: 1rem 2.5rem;
+    padding-block: clamp(2.5rem, 6vw, 4rem);
+  }
+  @media (min-width: 52rem) {
+    .section {
+      grid-template-columns: 13rem minmax(0, var(--measure));
+    }
+  }
+  .section > h2 {
+    font-size: var(--step-1);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .body {
+    max-width: var(--measure);
+  }
+  .body > :last-child {
+    margin-bottom: 0;
+  }
+  .intro {
+    font-size: var(--step-1);
+    line-height: 1.45;
+  }
+  h3 {
+    font-size: var(--step-0);
+    font-weight: 700;
+    margin: 2.5rem 0 0.75rem;
+  }
+  .product h3 {
+    font-size: var(--step-3);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin: 0 0 1rem;
+  }
+
+  .services {
+    margin: 2rem 0 0;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .services dt {
+    font-weight: 700;
+  }
+  .services dd {
+    margin: 0.25rem 0 0;
+    color: var(--steel);
+  }
+
+  .clients,
+  .story-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .clients li,
+  .story-list li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .clients span,
+  .story-list time {
+    color: var(--steel);
+  }
+
+  .contact {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  .contact img {
+    flex: none;
+    border-radius: 50%;
+    width: 96px;
+    height: 96px;
+  }
+  @media (max-width: 30rem) {
+    .contact {
+      flex-direction: column;
+    }
+  }
+</style>
