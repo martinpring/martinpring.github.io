@@ -1,21 +1,19 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { SITE } from '../site';
+import { getEntries, entryHref, entryTitle } from '../lib/timeline';
 
 export async function GET(context: APIContext) {
-  const stories = (await getCollection('story', ({ data }) => !data.draft)).sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-  );
+  const entries = await getEntries();
   return rss({
     title: `${SITE.name} | Story`,
-    description: 'Notes from building software, products and companies.',
+    description: 'The journey so far: building Tradesnap, Real Logic and what happens along the way.',
     site: context.site!,
-    items: stories.map((s) => ({
-      title: s.data.title,
-      description: s.data.description,
-      pubDate: s.data.date,
-      link: `/story/${s.id}/`,
+    items: entries.map((e) => ({
+      title: entryTitle(e),
+      description: e.data.description ?? (e.body ?? '').slice(0, 400),
+      pubDate: e.data.date,
+      link: entryHref(e),
     })),
   });
 }

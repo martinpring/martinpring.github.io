@@ -1,9 +1,11 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
+import { getEntries } from '../../lib/timeline';
 
+// Only long-form stories get their own page; posts and milestones live on the timeline.
 export async function getStaticPaths() {
-  const stories = await getCollection('story', ({ data }) => !data.draft);
+  const stories = (await getEntries()).filter((e) => e.data.kind === 'story');
   return stories.map((story) => ({ params: { id: story.id }, props: { story } }));
 }
 
@@ -13,7 +15,7 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long
 ---
 
 <Doc
-  title={story.data.title}
+  title={story.data.title ?? 'Story'}
   description={story.data.description}
   path={`story/${story.id}`}
   type="article"
@@ -24,6 +26,7 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long
     <time class="mono" datetime={story.data.date.toISOString()}>{dateFmt.format(story.data.date)}</time>
     <Content />
   </article>
+  <p class="back mono"><a href={`/story#${story.id}`}>← back to the timeline</a></p>
 </Doc>
 
 <style>
@@ -32,5 +35,13 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long
     margin-bottom: 2.25rem;
     font-size: 0.6875rem;
     color: var(--faint);
+  }
+  .back {
+    margin-top: 3rem;
+    font-size: 0.75rem;
+  }
+  .back a {
+    color: var(--muted) !important;
+    text-decoration: none;
   }
 </style>

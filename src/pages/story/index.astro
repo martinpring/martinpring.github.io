@@ -1,31 +1,117 @@
 ---
-import { getCollection } from 'astro:content';
+import { render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
+import { getEntries, byYear, SOURCE_LABEL, type Entry } from '../../lib/timeline';
 
-const stories = (await getCollection('story', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
-const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
+const entries = await getEntries();
+// Posts are shown in full on the timeline, so render their Markdown here.
+const rendered = new Map<string, Awaited<ReturnType<typeof render>>['Content']>();
+for (const e of entries) {
+  if (e.data.kind === 'post') rendered.set(e.id, (await render(e)).Content);
+}
+const years = byYear(entries);
+const count = (k: Entry['data']['kind']) => entries.filter((e) => e.data.kind === k).length;
+const filters = [
+  { key: 'all', label: 'all', n: entries.length },
+  { key: 'story', label: 'stories', n: count('story') },
+  { key: 'post', label: 'posts', n: count('post') },
+  { key: 'milestone', label: 'milestones', n: count('milestone') },
+].filter((f) => f.key === 'all' || f.n > 0);
+
+const day = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short' });
+const isDev = import.meta.env.DEV;
 ---
 
-<Doc title="Story" description="Notes from building software, products and companies." path="story">
+<Doc title="Story" description="The journey so far: building Tradesnap, Real Logic and what happens along the way." path="story">
   <h1>Story</h1>
-  <p>Notes from building software, products and companies.</p>
-  {stories.length === 0 && <p class="empty mono">first story is being written. check back soon.</p>}
-  <ul class="list">
-    {
-      stories.map((s) => (
-        <li>
-          <time class="mono" datetime={s.data.date.toISOString()}>
-            {dateFmt.format(s.data.date)}
-          </time>
-          <a href={`/story/${s.id}`}>{s.data.title}</a>
-          <p>{s.data.description}</p>
-        </li>
-      ))
-    }
-  </ul>
+  <p>The journey so far: building Tradesnap, Real Logic and what happens along the way. Newest first.</p>
+
+  {
+    entries.length === 0 ? (
+      <p class="empty mono">first story is being written. check back soon.</p>
+    ) : (
+      <>
+        {filters.length > 2 && (
+          <div class="filters mono" role="group" aria-label="Show">
+            {filters.map((f, i) => (
+              <button type="button" data-filter={f.key} aria-pressed={i === 0 ? 'true' : 'false'}>
+                {f.label} <span>{f.n}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div class="timeline">
+          {years.map(([year, list]) => (
+            <section class="year" data-year={year} aria-labelledby={`y-${year}`}>
+              <h2 id={`y-${year}`} class="year-label mono">
+                {year}
+              </h2>
+              <ol>
+                {list.map((e) => {
+                  const d = e.data;
+                  const Content = rendered.get(e.id);
+                  return (
+                    <li id={e.id} class={`entry kind-${d.kind}`} data-kind={d.kind}>
+                      <span class="node" aria-hidden="true" />
+                      <time class="mono" datetime={d.date.toISOString()}>
+                        {day.format(d.date)}
+                        {isDev && d.draft && <em> draft</em>}
+                      </time>
+
+                      {d.kind === 'story' && (
+                        <div class="body">
+                          <a class="story-title" href={`/story/${e.id}`}>
+                            {d.title}
+                          </a>
+                          <p>{d.description}</p>
+                        </div>
+                      )}
+
+                      {d.kind === 'milestone' && (
+                        <div class="body">
+                          <p class="milestone-title">{d.title}</p>
+                          {d.description && <p>{d.description}</p>}
+                        </div>
+                      )}
+
+                      {d.kind === 'post' && (
+                        <div class="body post">
+                          {d.title && <p class="post-title">{d.title}</p>}
+                          {Content && <Content />}
+                          {d.image && <img src={d.image} alt={d.imageAlt ?? ''} loading="lazy" />}
+                          {d.url && (
+                            <a class="via mono" href={d.url} rel="noopener">
+                              via {SOURCE_LABEL[d.source ?? 'site'] ?? d.source} ↗
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          ))}
+        </div>
+      </>
+    )
+  }
 </Doc>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const entries = document.querySelectorAll<HTMLElement>('.entry');
+  const years = document.querySelectorAll<HTMLElement>('.year');
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const key = b.dataset.filter;
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      entries.forEach((e) => (e.hidden = key !== 'all' && e.dataset.kind !== key));
+      years.forEach((y) => (y.hidden = !y.querySelector('.entry:not([hidden])')));
+    }),
+  );
+</script>
 
 <style>
   .empty {
@@ -35,29 +121,170 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-di
     font-size: 0.75rem;
     color: var(--faint);
   }
-  .list {
-    list-style: none;
-    padding: 0 !important;
-    margin: 2.5rem 0 0;
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 2rem 0 0.5rem;
   }
-  .list li {
-    padding: 1rem 0;
-    border-top: 1px solid var(--line);
-    margin: 0;
-  }
-  time {
-    display: block;
+  .filters button {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font: inherit;
     font-size: 0.6875rem;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+  }
+  .filters button span {
     color: var(--faint);
   }
-  a {
-    font-size: 1rem;
+  .filters button:hover,
+  .filters button[aria-pressed='true'] {
+    color: var(--text);
+    border-color: var(--muted);
+  }
+
+  /* ---------- rail ---------- */
+  .timeline {
+    --rail: 0.35rem; /* x of the vertical line */
+    position: relative;
+    margin-top: 2rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: var(--rail);
+    top: 0.6rem;
+    bottom: 0;
+    width: 1px;
+    background: var(--line);
+  }
+  .year + .year {
+    margin-top: 2.5rem;
+  }
+  .year-label {
+    position: relative;
+    margin: 0 0 1rem !important;
+    padding-left: 1.75rem;
+    font-size: 1.25rem !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    text-transform: none !important;
+  }
+  .year-label::before {
+    /* overrides the doc h2 bullet: a wider tick across the rail */
+    left: calc(var(--rail) - 0.3rem) !important;
+    top: 0.65em !important;
+    width: calc(0.6rem + 1px) !important;
+    height: 1px !important;
+    background: var(--muted) !important;
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0 !important;
+  }
+
+  .entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.25rem minmax(0, 1fr);
+    gap: 0 0.75rem;
+    padding: 0 0 1.75rem 1.75rem;
+    margin: 0 !important;
+    scroll-margin-top: 2rem;
+  }
+  .entry:target .body {
+    outline: 1px solid var(--line);
+    outline-offset: 0.6rem;
+  }
+  .node {
+    position: absolute;
+    left: calc(var(--rail) - 3px);
+    top: 0.45rem;
+    width: 7px;
+    height: 7px;
+    background: var(--bg);
+    border: 1px solid var(--muted);
+    border-radius: 50%;
+  }
+  .kind-story .node {
+    border-radius: 0;
+    background: var(--text);
+    border-color: var(--text);
+  }
+  .kind-milestone .node {
+    border-radius: 0;
+    transform: rotate(45deg) scale(1.15);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  time {
+    font-size: 0.6875rem;
+    color: var(--faint);
+    padding-top: 0.15rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  time em {
+    display: block;
+    font-style: normal;
+    color: var(--accent);
+    text-transform: lowercase;
+  }
+  .body > :last-child {
+    margin-bottom: 0;
+  }
+  .body p {
+    margin: 0 0 0.6em;
+  }
+
+  .story-title {
+    display: inline-block;
+    margin-bottom: 0.25rem;
+    font-size: 1.05rem;
+    color: var(--text);
     text-decoration: none;
   }
-  a:hover {
+  .story-title:hover {
     text-decoration: underline;
   }
-  .list p {
-    margin: 0.25rem 0 0;
+  .milestone-title {
+    color: var(--accent);
+  }
+  .post-title {
+    color: var(--text);
+  }
+  .post :global(p) {
+    white-space: pre-line; /* keeps the line breaks of copied social posts */
+  }
+  .post img {
+    margin: 0.75rem 0;
+    max-height: 22rem;
+    width: auto;
+    border: 1px solid var(--line);
+    filter: grayscale(0.25);
+  }
+  .via {
+    display: inline-block;
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    color: var(--muted) !important;
+    text-decoration: none;
+  }
+  .via:hover {
+    color: var(--text) !important;
+  }
+
+  @media (max-width: 30rem) {
+    .entry {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    time {
+      padding: 0 0 0.25rem;
+    }
   }
 </style>

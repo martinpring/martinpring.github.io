@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "import:linkedin": "node scripts/import-linkedin.mjs",
+    "import:instagram": "node scripts/import-instagram.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
