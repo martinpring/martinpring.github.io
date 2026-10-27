@@ -95,42 +95,54 @@ const person = {
       }
 
       // ---------- text scramble on hover/focus ----------
-      // Elements marked [data-scramble] cycle through random glyphs and settle left to right.
-      const GLYPHS = '!<>-_/[]{}=+*^?#%01ABCDEFGHJKLMNPQRSTUVWXYZabcdefghkmnpqrstuvwxyz';
+      // [data-scramble] text flips to symbols, then the real characters are revealed left to right.
+      // A [data-scramble-host] (e.g. a logo tile) scrambles every [data-scramble] inside it.
+      const SYMBOLS = '_-=+*^#!?<>{}[]/\\|~';
+      const STEP = 42; // ms per tick: glyphs refresh and one more character is revealed
+      const LEAD = 2; // ticks of pure symbols before the first character settles
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const running = new WeakSet<HTMLElement>();
+      const timers = new WeakMap<HTMLElement, number>();
       const scramble = (el: HTMLElement) => {
-        if (reduce || running.has(el)) return;
-        const text = (el.dataset.text ??= el.textContent ?? '');
-        if (!text.trim()) return;
-        if (!el.hasAttribute('aria-label') && !el.closest('[aria-label]')) el.setAttribute('aria-label', text);
-        running.add(el);
+        if (reduce || timers.has(el)) return;
+        const text = (el.dataset.text ??= (el.textContent ?? '').trim());
+        if (!text) return;
+        if (!el.hasAttribute('aria-label') && !el.closest('[aria-label], [aria-hidden="true"]')) {
+          el.setAttribute('aria-label', text);
+        }
         el.style.minWidth = `${el.getBoundingClientRect().width}px`;
-        const dur = Math.min(650, 220 + text.length * 22);
-        const settle = [...text].map((_, i) => (i / text.length) * dur * 0.75 + Math.random() * dur * 0.25);
-        const t0 = performance.now();
-        const frame = (now: number) => {
-          const t = now - t0;
+        let tick = 0;
+        const render = () => {
+          const shown = tick - LEAD;
           let out = '';
           for (let i = 0; i < text.length; i++) {
             const c = text[i];
-            out += /\s/.test(c) || t >= settle[i] ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+            if (i < shown || /\s/.test(c)) out += c;
+            else out += Math.random() < 0.12 ? '\u00a0' : SYMBOLS[(Math.random() * SYMBOLS.length) | 0];
           }
           el.textContent = out;
-          if (t < dur) requestAnimationFrame(frame);
-          else {
+          if (shown >= text.length) {
+            clearInterval(timers.get(el));
+            timers.delete(el);
             el.textContent = text;
             el.style.minWidth = '';
-            running.delete(el);
           }
+          tick++;
         };
-        requestAnimationFrame(frame);
+        render();
+        timers.set(el, window.setInterval(render, STEP));
       };
       const trigger = (e: Event) => {
         const target = e.target as HTMLElement;
+        const related = (e as PointerEvent).relatedTarget as Node | null;
+        const host = target.closest<HTMLElement>('[data-scramble-host]');
+        if (host) {
+          if (e.type === 'pointerover' && related && host.contains(related)) return;
+          host.querySelectorAll<HTMLElement>('[data-scramble]').forEach(scramble);
+          return;
+        }
         const el = target.closest<HTMLElement>('[data-scramble]');
         if (!el) return;
-        if (e.type === 'pointerover' && el.contains((e as PointerEvent).relatedTarget as Node)) return;
+        if (e.type === 'pointerover' && related && el.contains(related)) return;
         scramble(el);
       };
       document.addEventListener('pointerover', trigger);

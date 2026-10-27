@@ -93,13 +93,14 @@ export const PROJECTS: Project[] = [
 ];
 
 // Logo tiles in the top-right grid. Text wordmarks, not the organisations' logo files.
+// On hover, `note` scrambles in above the wordmark and `sub` below it.
 export const MARKS = [
-  { name: 'Tradesnap', note: 'co-founder', style: 'mark-round' },
-  { name: 'Real Logic', note: 'founder', style: 'mark-bold' },
-  { name: 'Inera', note: 'client', style: 'mark-light' },
-  { name: '1177', note: 'client', style: 'mark-mono' },
-  { name: 'Samtrafiken', note: 'client', style: 'mark-tight' },
-  { name: 'Nordic Medtest', note: 'client', style: 'mark-stack' },
-  { name: 'Melbie Group', note: 'board', style: 'mark-serif' },
-  { name: 'IF Karlstad', note: 'coach', style: 'mark-caps' },
+  { name: 'Tradesnap', note: 'now building', sub: 'skilled trades', style: 'mark-round' },
+  { name: 'Real Logic', note: 'founder & ceo', sub: 'distributed systems', style: 'mark-bold' },
+  { name: 'Inera', note: 'client', sub: 'e-health', style: 'mark-light' },
+  { name: '1177', note: 'client', sub: 'e-health', style: 'mark-mono' },
+  { name: 'Samtrafiken', note: 'client', sub: 'public transport', style: 'mark-tight' },
+  { name: 'Nordic Medtest', note: 'client', sub: 'healthcare', style: 'mark-stack' },
+  { name: 'Melbie Group', note: 'board member', sub: '', style: 'mark-serif' },
+  { name: 'IF Karlstad', note: 'academy coach', sub: 'u13\u2013u15', style: 'mark-caps' },
 ];

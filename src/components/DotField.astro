@@ -1,0 +1,103 @@
+---
+// Background dot grid with cloud-shaped patches of lit dots drifting right to left.
+// Brightness comes from two octaves of value noise scrolled over time.
+---
+
+<canvas class="dotfield" aria-hidden="true"></canvas>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>('.dotfield');
+  const ctx = canvas?.getContext('2d');
+  if (canvas && ctx) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const GAP = 14; // px between dots
+    const SPEED = 0.035; // noise units per second, drifting left
+    const FPS = 30;
+
+    // --- value noise ---
+    const hash = (x: number, y: number) => {
+      let h = (x * 374761393 + y * 668265263) | 0;
+      h = (h ^ (h >>> 13)) * 1274126177;
+      return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+    };
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    const noise = (x: number, y: number) => {
+      const xi = Math.floor(x);
+      const yi = Math.floor(y);
+      const xf = smooth(x - xi);
+      const yf = smooth(y - yi);
+      const a = hash(xi, yi);
+      const b = hash(xi + 1, yi);
+      const c = hash(xi, yi + 1);
+      const d = hash(xi + 1, yi + 1);
+      return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+    };
+
+    let w = 0;
+    let h = 0;
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = canvas.getBoundingClientRect();
+      w = r.width;
+      h = r.height;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const draw = (time: number) => {
+      const t = (time / 1000) * SPEED;
+      ctx.clearRect(0, 0, w, h);
+      for (let y = GAP / 2; y < h; y += GAP) {
+        for (let x = GAP / 2; x < w; x += GAP) {
+          const n = noise(x / 230 + t * 6, y / 170) * 0.65 + noise(x / 85 + t * 9, y / 70 + 50) * 0.35;
+          const k = (n - 0.56) / 0.2; // only the peaks light up
+          if (k <= 0) continue;
+          const a = Math.min(1, k) * 0.7;
+          ctx.fillStyle = `rgba(216, 212, 204, ${a.toFixed(3)})`;
+          ctx.fillRect(x - 0.9, y - 0.9, 1.8, 1.8);
+        }
+      }
+    };
+
+    let last = 0;
+    let raf = 0;
+    const loop = (time: number) => {
+      raf = requestAnimationFrame(loop);
+      if (time - last < 1000 / FPS) return;
+      last = time;
+      draw(time);
+    };
+
+    resize();
+    window.addEventListener('resize', () => {
+      resize();
+      if (reduce) draw(0);
+    });
+    if (reduce) {
+      draw(0);
+    } else {
+      raf = requestAnimationFrame(loop);
+      document.addEventListener('visibilitychange', () => {
+        cancelAnimationFrame(raf);
+        if (!document.hidden) raf = requestAnimationFrame(loop);
+      });
+    }
+  }
+</script>
+
+<style>
+  .dotfield {
+    position: absolute;
+    /* a canvas doesn't stretch from inset alone, so size it explicitly */
+    top: 1.6rem;
+    left: var(--frame);
+    width: calc(100% - 2 * var(--frame));
+    height: calc(100% - 4.2rem);
+    pointer-events: none;
+    z-index: 0;
+    /* fade the field out towards the edges and away from the text column */
+    -webkit-mask-image: radial-gradient(70% 70% at 62% 42%, #000 35%, transparent 80%);
+    mask-image: radial-gradient(70% 70% at 62% 42%, #000 35%, transparent 80%);
+  }
+</style>
