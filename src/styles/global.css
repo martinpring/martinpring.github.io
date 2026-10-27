@@ -95,35 +95,31 @@ img {
   background: var(--button);
   color: var(--button-ink);
 }
-.btn-solid:hover {
-  background: var(--text);
-}
-.btn-ghost {
-  position: relative;
+.btn-solid:hover,
+.btn-solid:focus-visible {
+  background: color-mix(in srgb, var(--button) 45%, var(--bg));
   color: var(--text);
 }
-.btn-ghost::before,
-.btn-ghost::after {
-  content: '';
-  position: absolute;
-  width: 6px;
-  top: -1px;
-  bottom: -1px;
-  border: 1px solid var(--faint);
-  transition: width 200ms, border-color 200ms;
+
+/* Ghost button: four corner ticks, text brightens on hover */
+.btn-ghost {
+  --tick: var(--faint);
+  color: var(--muted);
+  background:
+    linear-gradient(var(--tick), var(--tick)) top left / 6px 1px,
+    linear-gradient(var(--tick), var(--tick)) top left / 1px 6px,
+    linear-gradient(var(--tick), var(--tick)) top right / 6px 1px,
+    linear-gradient(var(--tick), var(--tick)) top right / 1px 6px,
+    linear-gradient(var(--tick), var(--tick)) bottom left / 6px 1px,
+    linear-gradient(var(--tick), var(--tick)) bottom left / 1px 6px,
+    linear-gradient(var(--tick), var(--tick)) bottom right / 6px 1px,
+    linear-gradient(var(--tick), var(--tick)) bottom right / 1px 6px;
+  background-repeat: no-repeat;
 }
-.btn-ghost::before {
-  left: 0;
-  border-right: 0;
-}
-.btn-ghost::after {
-  right: 0;
-  border-left: 0;
-}
-.btn-ghost:hover::before,
-.btn-ghost:hover::after {
-  width: 50%;
-  border-color: var(--muted);
+.btn-ghost:hover,
+.btn-ghost:focus-visible {
+  --tick: var(--muted);
+  color: var(--text);
 }
 
 .skip {

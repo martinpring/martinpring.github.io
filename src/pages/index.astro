@@ -2,10 +2,11 @@
 import Base from '../layouts/Base.astro';
 import Screen from '../components/Screen.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import DotField from '../components/DotField.astro';
 import { SITE } from '../site';
 import { PROJECTS, MARKS } from '../projects';
 
-const tickerItem = `consulting through Real Logic AB, building Tradesnap. say hi: ${SITE.email}`;
+const tickerItem = 'building Tradesnap \u2013 mobile-first AI for skilled trade businesses';
 const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
 ---
 
@@ -13,7 +14,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
   <!-- Preloader: counts to 100 once per session -->
   <div class="loader mono" aria-hidden="true"><span data-count>00</span>%</div>
 
-  <a class="ticker mono" href={`mailto:${SITE.email}`} aria-label={`Email ${SITE.email}`}>
+  <a class="ticker mono" href={SITE.links.tradesnap} aria-label="Building Tradesnap, mobile-first AI for skilled trade businesses. Visit tradesnaphq.com">
     <span class="ticker-track">
       {Array.from({ length: 8 }, () => <span>{tickerItem}<i>✳</i></span>)}
     </span>
@@ -21,6 +22,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
 
   <main id="main" class="stage">
     <div class="frame" aria-hidden="true"></div>
+    <DotField />
 
     <header class="top">
       <div class="intro">
@@ -39,7 +41,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
         <p class="blurb">
           I help teams in <b>healthcare, transport and logistics</b> build <b>resilient systems</b>. Co-founder of
           Tradesnap.<br />
-          <a class="more" href={SITE.links.tradesnap} data-scramble>see what I’m building.</a>
+          <a class="more" href={SITE.links.tradesnap}>see what I’m building.</a>
         </p>
 
         <h2 class="headline">building resilient systems for industries that can’t afford downtime</h2>
@@ -55,7 +57,8 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
           MARKS.map((m) => (
             <li class={m.style} data-scramble-host>
               <span class="mark-note mono" data-scramble>{m.note}</span>
-              <span class="mark-name" data-scramble>{m.name}</span>
+              <span class="mark-name">{m.name}</span>
+              {m.sub && <span class="mark-sub mono" data-scramble>{m.sub}</span>}
             </li>
           ))
         }
@@ -76,8 +79,8 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
       <ul class="strip" tabindex="0" aria-label="Work">
         {
           PROJECTS.map((p) => (
-            <li class="card" data-id={p.id} data-scramble-host>
-              <span class="tag mono" aria-hidden="true" data-scramble>{p.name}</span>
+            <li class="card" data-id={p.id}>
+              <span class="tag mono" aria-hidden="true">{p.name}</span>
               <div class="crt" aria-hidden="true">
                 {p.image ? <img src={p.image} alt="" loading="lazy" /> : <Screen type={p.screen} />}
                 <span class="info mono">i</span>
@@ -119,7 +122,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
           </ul>
           {p.href && (
             <p>
-              <a class="btn btn-solid" href={p.href} data-scramble>
+              <a class="btn btn-solid" href={p.href}>
                 {p.linkLabel}
               </a>
             </p>
@@ -129,7 +132,7 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
     }
     <span id="sheet-title" class="visually-hidden">Project details</span>
     <form method="dialog">
-      <button class="close mono" type="submit" data-scramble>[ close ]</button>
+      <button class="close mono" type="submit">[ close ]</button>
     </form>
   </dialog>
 </Base>
@@ -424,17 +427,29 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
     background: #2a2926;
     color: var(--text);
   }
-  .mark-note {
+  .mark-note,
+  .mark-sub {
     position: absolute;
-    top: 0.45rem;
-    left: 0;
-    right: 0;
-    font-size: 0.5625rem;
-    color: var(--faint);
+    left: 0.25rem;
+    right: 0.25rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
     opacity: 0;
-    transition: opacity 200ms;
+    transition: opacity 120ms;
   }
-  .marks li:hover .mark-note {
+  .mark-note {
+    top: 0.55rem;
+  }
+  .mark-sub {
+    bottom: 0.55rem;
+    color: var(--faint);
+  }
+  .marks li:hover .mark-note,
+  .marks li:hover .mark-sub {
     opacity: 1;
   }
   .mark-name {
@@ -483,14 +498,14 @@ const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm'
     text-transform: uppercase;
   }
 
-  /* ---------- dot field ---------- */
+  /* spacer between intro and work strip; the moving dots are drawn by DotField */
   .dots {
     min-height: 2rem;
-    background-image: radial-gradient(#3a3733 1px, transparent 1.3px);
-    background-size: 14px 14px;
-    -webkit-mask-image: radial-gradient(40% 60% at 35% 50%, #000, transparent 70%);
-    mask-image: radial-gradient(40% 60% at 35% 50%, #000, transparent 70%);
-    opacity: 0.8;
+  }
+  .top,
+  .work {
+    position: relative;
+    z-index: 1;
   }
 
   /* ---------- work strip ---------- */
