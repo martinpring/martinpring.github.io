@@ -3,7 +3,7 @@ import Doc from '../layouts/Doc.astro';
 import { SITE } from '../site';
 ---
 
-<Doc title="Privacy" description="What this website does and doesn’t do with your data." path="legal\privacy">
+<Doc title="Privacy" description="What this website does and doesn’t do with your data." path="legal/privacy">
   <h1>Privacy</h1>
   <p>Martin Pring, Real Logic AB, Sweden. Contact: <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
 
@@ -12,8 +12,8 @@ import { SITE } from '../site';
 
   <h2>Stored in your browser</h2>
   <p>
-    Two small preferences are kept locally in your browser and never leave it: whether sounds are on, and whether
-    you’ve already seen the loading counter this session. Clear your site data to remove them.
+    One small flag is kept in your browser for the current session only: whether you’ve already seen the loading
+    counter. It never leaves your browser and is gone when you close the tab.
   </p>
 
   <h2>Hosting</h2>

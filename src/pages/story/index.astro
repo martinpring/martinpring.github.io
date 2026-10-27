@@ -11,6 +11,7 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-di
 <Doc title="Story" description="Notes from building software, products and companies." path="story">
   <h1>Story</h1>
   <p>Notes from building software, products and companies.</p>
+  {stories.length === 0 && <p class="empty mono">first story is being written. check back soon.</p>}
   <ul class="list">
     {
       stories.map((s) => (
@@ -27,6 +28,13 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-di
 </Doc>
 
 <style>
+  .empty {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.75rem;
+    color: var(--faint);
+  }
   .list {
     list-style: none;
     padding: 0 !important;

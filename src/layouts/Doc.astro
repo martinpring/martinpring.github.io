@@ -5,12 +5,12 @@ import Base from './Base.astro';
 interface Props {
   title: string;
   description?: string;
-  path: string; // e.g. 'story\\my-post'
+  path: string; // e.g. 'story/my-post'
   type?: 'website' | 'article';
   published?: Date;
 }
 const { title, description, path, type, published } = Astro.props;
-const parts = path.split('\\');
+const parts = path.split('/');
 const last = parts.pop();
 ---
 
@@ -18,8 +18,8 @@ const last = parts.pop();
   <div class="frame" aria-hidden="true"></div>
   <main id="main" class="doc">
     <nav class="crumbs mono" aria-label="Breadcrumb">
-      <a href="/">← back to index</a>
-      <span class="path" aria-hidden="true">C:\index\{parts.map((p) => `${p}\\`)}<b>{last}</b></span>
+      <a href="/" data-scramble>← back to index</a>
+      <span class="path" aria-hidden="true">~/{parts.map((p) => `${p}/`)}<b>{last}</b></span>
     </nav>
     <slot />
   </main>

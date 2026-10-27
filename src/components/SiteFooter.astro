@@ -9,14 +9,11 @@ const links = [
 
 <footer class="foot mono">
   <p>© {year} Martin Pring. All rights reserved.</p>
-  <button class="sound" type="button" data-sound-toggle aria-pressed="false">
-    [ <span data-sound-label>sounds off</span> <span class="wave" aria-hidden="true"></span> ]
-  </button>
   <ul>
     {
       links.map((l) => (
         <li>
-          <a href={l.href}>{l.label}</a>
+          <a href={l.href} data-scramble>{l.label}</a>
         </li>
       ))
     }
@@ -32,7 +29,7 @@ const links = [
     z-index: 30;
     height: 2.6rem;
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 1fr auto;
     align-items: center;
     gap: 1rem;
     padding: 0 var(--gutter);
@@ -43,45 +40,6 @@ const links = [
   }
   p {
     margin: 0;
-  }
-  .sound {
-    background: var(--tile);
-    border: 1px solid var(--line);
-    color: var(--muted);
-    font: inherit;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0.25rem 0.6rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .sound:hover {
-    color: var(--text);
-  }
-  .wave {
-    display: inline-block;
-    width: 1.4rem;
-    height: 1px;
-    background: currentColor;
-  }
-  .sound[aria-pressed='true'] .wave {
-    height: 0.6rem;
-    background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 3px);
-    -webkit-mask: linear-gradient(0deg, #000 0 0) center / 100% 30% no-repeat;
-    animation: eq 0.9s steps(4) infinite;
-  }
-  @keyframes eq {
-    25% {
-      -webkit-mask-size: 100% 90%;
-    }
-    50% {
-      -webkit-mask-size: 100% 50%;
-    }
-    75% {
-      -webkit-mask-size: 100% 100%;
-    }
   }
   ul {
     justify-self: end;
@@ -98,9 +56,6 @@ const links = [
     color: var(--text);
   }
   @media (max-width: 40rem) {
-    .foot {
-      grid-template-columns: auto 1fr;
-    }
     p {
       display: none;
     }

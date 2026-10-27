@@ -3,11 +3,16 @@
 // public/images/work/ and set `image: '/images/work/<file>'` on the project.
 export type Screen = 'quote' | 'status' | 'integration' | 'departures' | 'lab' | 'story';
 
+/** A paragraph, or a titled bullet list. */
+export type Block = string | { heading: string; items: string[] };
+
 export interface Project {
   id: string;
   name: string;
   role: string;
   summary: string;
+  /** Longer text for the detail dialog; falls back to `summary`. */
+  body?: Block[];
   stack: string[];
   href?: string;
   linkLabel?: string;
@@ -20,8 +25,22 @@ export const PROJECTS: Project[] = [
     id: 'tradesnap',
     name: 'Tradesnap',
     role: 'Co-founder',
-    summary:
-      'Mobile-first, AI-native app for trade businesses. Quotes and invoices from the phone, done before you leave the job.',
+    summary: 'Tradesnap is the future of quotes and invoices for the skilled trades.',
+    body: [
+      'Tradesnap is the future of quotes and invoices for the skilled trades.',
+      'You didn\u2019t learn a trade to spend your evenings at the kitchen table writing quotes. With Tradesnap you describe the job in your own words, straight from your phone, and get a complete quote back in seconds.',
+      {
+        heading: 'How it works:',
+        items: [
+          'Describe the job \u2013 Tradesnap builds the line items, with labour and materials kept apart',
+          'Send the quote as a link by text or email \u2013 your customer approves it on their phone, and you see it in the app as soon as they say yes',
+          'Turn an approved quote into an invoice in one tap, and download any document as a PDF',
+        ],
+      },
+      'You stay in control: review and adjust every line before anything is sent.',
+      'Less paperwork. More paid work.',
+      'Built in Sweden, together with tradespeople.',
+    ],
     stack: ['Mobile', 'AI', 'Quotes & invoices'],
     href: 'https://tradesnaphq.com/',
     linkLabel: 'visit tradesnaphq.com',
@@ -32,7 +51,7 @@ export const PROJECTS: Project[] = [
     name: 'Real Logic',
     role: 'Founder & CEO',
     summary:
-      'My company. Resilient distributed systems for healthcare, transportation and logistics, built for industries that can’t afford downtime.',
+      'Resilient distributed systems for healthcare, transportation and logistics, built for industries that can’t afford downtime.',
     stack: ['Java', 'Spring Boot', 'Kubernetes', 'OpenShift'],
     screen: 'status',
   },
@@ -75,10 +94,10 @@ export const PROJECTS: Project[] = [
 
 // Logo tiles in the top-right grid. Text wordmarks, not the organisations' logo files.
 export const MARKS = [
-  { name: 'Real Logic', note: 'founder', style: 'mark-bold' },
   { name: 'Tradesnap', note: 'co-founder', style: 'mark-round' },
+  { name: 'Real Logic', note: 'founder', style: 'mark-bold' },
   { name: 'Inera', note: 'client', style: 'mark-light' },
-  { name: '1177', note: 'e-health', style: 'mark-mono' },
+  { name: '1177', note: 'client', style: 'mark-mono' },
   { name: 'Samtrafiken', note: 'client', style: 'mark-tight' },
   { name: 'Nordic Medtest', note: 'client', style: 'mark-stack' },
   { name: 'Melbie Group', note: 'board', style: 'mark-serif' },
