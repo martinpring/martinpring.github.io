@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('story', ({ data }) => !data.draft);
+  return stories.map((story) => ({ params: { id: story.id }, props: { story } }));
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+const dateFmt = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<Doc
+  title={story.data.title}
+  description={story.data.description}
+  path={`story\\${story.id}`}
+  type="article"
+  published={story.data.date}
+>
+  <article>
+    <h1>{story.data.title}</h1>
+    <time class="mono" datetime={story.data.date.toISOString()}>{dateFmt.format(story.data.date)}</time>
+    <Content />
+  </article>
+</Doc>
+
+<style>
+  time {
+    display: block;
+    margin-bottom: 2.25rem;
+    font-size: 0.6875rem;
+    color: var(--faint);
+  }
+</style>

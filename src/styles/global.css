@@ -1,0 +1,160 @@
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+
+:root {
+  --bg: #181716;
+  --bg-raised: #1f1e1c;
+  --tile: #22211f;
+  --line: #2c2a27;
+  --line-soft: #242220;
+  --text: #d8d4cc;
+  --muted: #7d7972;
+  --faint: #55524d;
+  --button: #b9b3a7;
+  --button-ink: #1a1917;
+  --accent: #d9c98a;
+
+  --sans: 'Geist Variable', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --gutter: clamp(1rem, 2.6vw, 2.5rem);
+  --frame: clamp(0.5rem, 1.3vw, 1.25rem);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Film grain over everything */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mono {
+  font-family: var(--mono);
+  letter-spacing: 0.02em;
+}
+
+/* Bracketed, terminal-style buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  padding: 0.5rem 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background-color 160ms, color 160ms, border-color 160ms;
+}
+.btn-solid {
+  background: var(--button);
+  color: var(--button-ink);
+}
+.btn-solid:hover {
+  background: var(--text);
+}
+.btn-ghost {
+  position: relative;
+  color: var(--text);
+}
+.btn-ghost::before,
+.btn-ghost::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  top: -1px;
+  bottom: -1px;
+  border: 1px solid var(--faint);
+  transition: width 200ms, border-color 200ms;
+}
+.btn-ghost::before {
+  left: 0;
+  border-right: 0;
+}
+.btn-ghost::after {
+  right: 0;
+  border-left: 0;
+}
+.btn-ghost:hover::before,
+.btn-ghost:hover::after {
+  width: 50%;
+  border-color: var(--muted);
+}
+
+.skip {
+  position: absolute;
+  left: -999px;
+}
+.skip:focus {
+  left: 1rem;
+  top: 2.5rem;
+  z-index: 60;
+  background: var(--button);
+  color: var(--button-ink);
+  padding: 0.4rem 0.7rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

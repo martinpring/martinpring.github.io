@@ -1,0 +1,132 @@
+---
+// Terminal-style document page: back link + path, single column.
+import Base from './Base.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  path: string; // e.g. 'story\\my-post'
+  type?: 'website' | 'article';
+  published?: Date;
+}
+const { title, description, path, type, published } = Astro.props;
+const parts = path.split('\\');
+const last = parts.pop();
+---
+
+<Base title={title} description={description} type={type} published={published}>
+  <div class="frame" aria-hidden="true"></div>
+  <main id="main" class="doc">
+    <nav class="crumbs mono" aria-label="Breadcrumb">
+      <a href="/">← back to index</a>
+      <span class="path" aria-hidden="true">C:\index\{parts.map((p) => `${p}\\`)}<b>{last}</b></span>
+    </nav>
+    <slot />
+  </main>
+</Base>
+
+<style>
+  .frame {
+    position: fixed;
+    inset: 0 var(--frame);
+    border-left: 1px solid var(--line-soft);
+    border-right: 1px solid var(--line-soft);
+    pointer-events: none;
+  }
+  .doc {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 1.75rem var(--gutter) 5rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
+  .crumbs {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 0 -0.75rem 2.25rem;
+    font-size: 0.6875rem;
+    color: var(--faint);
+  }
+  .crumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--text);
+  }
+  .path b {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .doc :global(h1) {
+    margin: 0 0 0.4rem;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    color: var(--text);
+  }
+  .doc :global(h2) {
+    position: relative;
+    margin: 2.4rem 0 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+  .doc :global(h2)::before {
+    content: '';
+    position: absolute;
+    left: -0.8rem;
+    top: 0.45em;
+    width: 4px;
+    height: 4px;
+    background: var(--muted);
+  }
+  .doc :global(h3),
+  .doc :global(h4) {
+    margin: 1.8rem 0 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .doc :global(p) {
+    margin: 0 0 1em;
+  }
+  .doc :global(a) {
+    color: var(--text);
+  }
+  .doc :global(strong) {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .doc :global(code) {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: var(--text);
+  }
+  .doc :global(pre) {
+    background: #121110 !important;
+    border: 1px solid var(--line);
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    font-size: 0.75rem;
+  }
+  .doc :global(img) {
+    border: 1px solid var(--line);
+    filter: grayscale(0.3) brightness(0.9);
+  }
+  .doc :global(ul),
+  .doc :global(ol) {
+    padding-left: 1.1rem;
+  }
+  .doc :global(li) {
+    margin-bottom: 0.35rem;
+  }
+</style>

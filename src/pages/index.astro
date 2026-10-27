@@ -1,0 +1,745 @@
+---
+import Base from '../layouts/Base.astro';
+import Screen from '../components/Screen.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { SITE } from '../site';
+import { PROJECTS, MARKS } from '../projects';
+
+const tickerItem = `consulting through Real Logic AB, building Tradesnap. say hi: ${SITE.email}`;
+const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
+---
+
+<Base>
+  <!-- Preloader: counts to 100 once per session -->
+  <div class="loader mono" aria-hidden="true"><span data-count>00</span>%</div>
+
+  <a class="ticker mono" href={`mailto:${SITE.email}`} aria-label={`Email ${SITE.email}`}>
+    <span class="ticker-track">
+      {Array.from({ length: 8 }, () => <span>{tickerItem}<i>✳</i></span>)}
+    </span>
+  </a>
+
+  <main id="main" class="stage">
+    <div class="frame" aria-hidden="true"></div>
+
+    <header class="top">
+      <div class="intro">
+        <div class="who">
+          <img src="/images/mp.png" alt="" width="44" height="44" />
+          <div>
+            <h1 class="name">Martin Pring</h1>
+            <p class="role">Founder &amp; CEO, Real Logic</p>
+          </div>
+          <div class="where mono">
+            <time data-clock>{clockFmt.format(new Date())}</time>
+            <span>SWEDEN</span>
+          </div>
+        </div>
+
+        <p class="blurb">
+          I help teams in <b>healthcare, transport and logistics</b> ship <b>backends and integrations</b> that stay up.
+          Co-founder of Tradesnap.<br />
+          <a class="more" href={SITE.links.tradesnap}>see what I’m building.</a>
+        </p>
+
+        <h2 class="headline">building resilient systems for industries that can’t afford downtime</h2>
+
+        <p class="actions">
+          <a class="btn btn-solid" href={`mailto:${SITE.email}`}>email me</a>
+          <a class="btn btn-ghost" href={SITE.links.linkedin} rel="me">linkedin</a>
+        </p>
+      </div>
+
+      <ul class="marks" aria-label="Companies and organisations I work with">
+        {
+          MARKS.map((m) => (
+            <li class={m.style} data-tick>
+              <span class="mark-note mono">{m.note}</span>
+              <span class="mark-name">{m.name}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+
+    <div class="dots" aria-hidden="true"></div>
+
+    <section class="work" aria-labelledby="work-title">
+      <div class="work-head mono">
+        <h2 id="work-title" class="work-label">some work, scroll ↓</h2>
+        <button class="play" type="button" aria-pressed="false" aria-label="Auto-scroll work">
+          <span aria-hidden="true">▶</span>
+        </button>
+        <span class="progress" aria-hidden="true"><span></span></span>
+      </div>
+
+      <ul class="strip" tabindex="0" aria-label="Work">
+        {
+          PROJECTS.map((p) => (
+            <li class="card" data-id={p.id}>
+              <span class="tag mono" aria-hidden="true">{p.name}</span>
+              <div class="crt" aria-hidden="true">
+                {p.image ? <img src={p.image} alt="" loading="lazy" /> : <Screen type={p.screen} />}
+                <span class="info mono">i</span>
+              </div>
+              <button class="hit" type="button" aria-haspopup="dialog" aria-label={`${p.name}, ${p.role}. More info`} />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+
+  <SiteFooter />
+
+  <dialog class="sheet" aria-labelledby="sheet-title">
+    {
+      PROJECTS.map((p) => (
+        <article data-for={p.id} hidden>
+          <p class="sheet-role mono">{p.role}</p>
+          <h3 id={`sheet-${p.id}`}>{p.name}</h3>
+          <p>{p.summary}</p>
+          <ul class="chips mono">
+            {p.stack.map((s) => (
+              <li>{s}</li>
+            ))}
+          </ul>
+          {p.href && (
+            <p>
+              <a class="btn btn-solid" href={p.href}>
+                {p.linkLabel}
+              </a>
+            </p>
+          )}
+        </article>
+      ))
+    }
+    <span id="sheet-title" class="visually-hidden">Project details</span>
+    <form method="dialog">
+      <button class="close mono" type="submit">[ close ]</button>
+    </form>
+  </dialog>
+</Base>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- preloader ----------
+  const loader = document.querySelector<HTMLElement>('.loader');
+  const count = loader?.querySelector<HTMLElement>('[data-count]');
+  let seen = false;
+  try {
+    seen = sessionStorage.getItem('mp-loaded') === '1';
+    sessionStorage.setItem('mp-loaded', '1');
+  } catch {}
+  if (loader && count) {
+    if (seen || reduce) {
+      loader.remove();
+    } else {
+      const start = performance.now();
+      const dur = 900;
+      const step = (t: number) => {
+        const k = Math.min(1, (t - start) / dur);
+        count.textContent = String(Math.round(k * 100)).padStart(2, '0');
+        if (k < 1) requestAnimationFrame(step);
+        else {
+          loader.classList.add('done');
+          setTimeout(() => loader.remove(), 500);
+        }
+      };
+      requestAnimationFrame(step);
+    }
+  }
+
+  // ---------- clock ----------
+  const clock = document.querySelector<HTMLTimeElement>('[data-clock]');
+  if (clock) {
+    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
+    const t = () => (clock.textContent = fmt.format(new Date()));
+    t();
+    setInterval(t, 15_000);
+  }
+
+  // ---------- CRT strip ----------
+  const strip = document.querySelector<HTMLElement>('.strip');
+  const bar = document.querySelector<HTMLElement>('.progress > span');
+  const play = document.querySelector<HTMLButtonElement>('.play');
+  if (strip && bar) {
+    const cards = [...strip.querySelectorAll<HTMLElement>('.card')];
+
+    // Curve the strip: cards turn towards the viewer the closer they are to the centre.
+    const bend = () => {
+      const r = strip.getBoundingClientRect();
+      const mid = r.left + r.width / 2;
+      for (const c of cards) {
+        const b = c.getBoundingClientRect();
+        const d = (b.left + b.width / 2 - mid) / (r.width / 2); // -1 .. 1
+        const k = Math.max(-1.4, Math.min(1.4, d));
+        c.style.setProperty('--ry', `${(-k * 14).toFixed(2)}deg`);
+        c.style.setProperty('--z', `${(-Math.abs(k) * 60).toFixed(1)}px`);
+      }
+      const max = strip.scrollWidth - strip.clientWidth;
+      bar.style.transform = `scaleX(${max > 0 ? strip.scrollLeft / max : 1})`;
+    };
+    strip.addEventListener('scroll', () => requestAnimationFrame(bend), { passive: true });
+    window.addEventListener('resize', bend);
+    bend();
+
+    // Vertical wheel scrolls the strip sideways ("scroll ↓").
+    strip.addEventListener(
+      'wheel',
+      (e) => {
+        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        const max = strip.scrollWidth - strip.clientWidth;
+        const atEdge = (e.deltaY < 0 && strip.scrollLeft <= 0) || (e.deltaY > 0 && strip.scrollLeft >= max - 1);
+        if (atEdge) return;
+        e.preventDefault();
+        strip.scrollLeft += e.deltaY;
+      },
+      { passive: false },
+    );
+
+    // Auto-scroll toggle.
+    let auto = 0;
+    let dir = 1;
+    const run = () => {
+      const max = strip.scrollWidth - strip.clientWidth;
+      if (strip.scrollLeft >= max - 1) dir = -1;
+      if (strip.scrollLeft <= 0) dir = 1;
+      strip.scrollLeft += dir * 0.8;
+      auto = requestAnimationFrame(run);
+    };
+    play?.addEventListener('click', () => {
+      const on = play.getAttribute('aria-pressed') !== 'true';
+      play.setAttribute('aria-pressed', String(on));
+      play.querySelector('span')!.textContent = on ? '❚❚' : '▶';
+      if (on) auto = requestAnimationFrame(run);
+      else cancelAnimationFrame(auto);
+    });
+  }
+
+  // ---------- project sheet ----------
+  const sheet = document.querySelector<HTMLDialogElement>('.sheet');
+  document.querySelectorAll<HTMLButtonElement>('.hit').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.closest<HTMLElement>('.card')?.dataset.id;
+      if (!sheet || !id) return;
+      sheet.querySelectorAll<HTMLElement>('article').forEach((a) => (a.hidden = a.dataset.for !== id));
+      sheet.setAttribute('aria-labelledby', `sheet-${id}`);
+      sheet.showModal();
+    });
+  });
+  sheet?.addEventListener('click', (e) => {
+    if (e.target === sheet) sheet.close();
+  });
+</script>
+
+<style>
+  /* ---------- preloader ---------- */
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 0.75rem;
+    transition: opacity 450ms;
+  }
+  .loader:global(.done) {
+    opacity: 0;
+  }
+
+  /* ---------- ticker ---------- */
+  .ticker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    height: 1.6rem;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--faint);
+    font-size: 0.625rem;
+    text-decoration: none;
+    white-space: nowrap;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .ticker:hover {
+    color: var(--muted);
+  }
+  .ticker-track {
+    display: flex;
+    animation: marquee 60s linear infinite;
+  }
+  .ticker-track > span {
+    padding-right: 1.25rem;
+  }
+  .ticker i {
+    font-style: normal;
+    padding-left: 1.25rem;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ---------- stage ---------- */
+  .stage {
+    position: relative;
+    min-height: 100dvh;
+    padding: calc(1.6rem + clamp(1rem, 2.4vw, 2rem)) var(--gutter) 3.25rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    gap: 1rem;
+  }
+  .work {
+    min-width: 0;
+  }
+  .frame {
+    position: absolute;
+    inset: 1.6rem var(--frame) 2.6rem;
+    border-left: 1px solid var(--line-soft);
+    border-right: 1px solid var(--line-soft);
+    pointer-events: none;
+  }
+
+  .top {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .who {
+    display: grid;
+    grid-template-columns: 44px auto auto;
+    gap: 0.9rem;
+    align-items: center;
+    justify-content: start;
+  }
+  .who img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.05);
+  }
+  .name {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .role {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  .where {
+    display: grid;
+    margin-left: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .where time {
+    color: var(--text);
+  }
+
+  .blurb {
+    margin: 1.4rem 0 0;
+    max-width: 44ch;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+  .blurb b {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .more {
+    color: var(--accent);
+  }
+
+  .headline {
+    margin: 2.25rem 0 0;
+    max-width: 24ch;
+    font-size: clamp(1.35rem, 1.9vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.6rem;
+    margin: 1.4rem 0 0;
+  }
+
+  /* ---------- marks grid ---------- */
+  .marks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, clamp(5.5rem, 7.4vw, 7.5rem));
+    gap: 2px;
+  }
+  .marks li {
+    position: relative;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    padding: 0.5rem;
+    background: var(--tile);
+    color: #bdb8ae;
+    text-align: center;
+    line-height: 1.05;
+    transition: background-color 200ms, color 200ms;
+  }
+  .marks li:hover {
+    background: #2a2926;
+    color: var(--text);
+  }
+  .mark-note {
+    position: absolute;
+    top: 0.45rem;
+    left: 0;
+    right: 0;
+    font-size: 0.5625rem;
+    color: var(--faint);
+    opacity: 0;
+    transition: opacity 200ms;
+  }
+  .marks li:hover .mark-note {
+    opacity: 1;
+  }
+  .mark-name {
+    font-size: 0.8rem;
+  }
+  .mark-bold .mark-name {
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-size: 0.95rem;
+  }
+  .mark-round .mark-name {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .mark-light .mark-name {
+    font-weight: 300;
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+  }
+  .mark-mono .mark-name {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+  .mark-tight .mark-name {
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    font-size: 0.78rem;
+  }
+  .mark-stack .mark-name {
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    max-width: 6ch;
+  }
+  .mark-serif .mark-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+  .mark-caps .mark-name {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- dot field ---------- */
+  .dots {
+    min-height: 2rem;
+    background-image: radial-gradient(#3a3733 1px, transparent 1.3px);
+    background-size: 14px 14px;
+    -webkit-mask-image: radial-gradient(40% 60% at 35% 50%, #000, transparent 70%);
+    mask-image: radial-gradient(40% 60% at 35% 50%, #000, transparent 70%);
+    opacity: 0.8;
+  }
+
+  /* ---------- work strip ---------- */
+  .work-head {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.9rem;
+    font-size: 0.625rem;
+    color: var(--faint);
+    margin-bottom: 0.9rem;
+  }
+  .work-label {
+    margin: 0;
+    font: inherit;
+    text-transform: uppercase;
+  }
+  .play {
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font-size: 0.6rem;
+    cursor: pointer;
+    padding: 0.2rem;
+  }
+  .progress {
+    width: clamp(4rem, 8vw, 6rem);
+    height: 1px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .progress > span {
+    display: block;
+    height: 100%;
+    background: var(--muted);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  .strip {
+    list-style: none;
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 1.75rem var(--gutter) 0.5rem;
+    display: flex;
+    gap: clamp(0.75rem, 1.2vw, 1.25rem);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    perspective: 1100px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  }
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card {
+    position: relative;
+    flex: none;
+    width: clamp(13rem, 19vw, 18rem);
+    scroll-snap-align: center;
+    transform: rotateY(var(--ry, 0deg)) translateZ(var(--z, 0px));
+    transform-style: preserve-3d;
+    transition: transform 120ms linear;
+  }
+  .tag {
+    position: absolute;
+    top: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    font-size: 0.5625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--tile);
+    color: var(--muted);
+    padding: 0.15rem 0.45rem;
+    opacity: 0;
+    transition: opacity 180ms, transform 180ms;
+    white-space: nowrap;
+  }
+  .card:hover .tag,
+  .card:focus-within .tag {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+
+  .hit {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 7% / 10%;
+  }
+  .crt {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    container-type: inline-size;
+    overflow: hidden;
+    /* bulged tube */
+    border-radius: 7% / 10%;
+    background: #000;
+    filter: grayscale(1) brightness(0.48) contrast(1.05) blur(0.3px);
+    transition: filter 260ms ease;
+  }
+  .crt img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* vignette + scanlines + glass */
+  .crt::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+      repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.07) 0 1px, transparent 1px 3px),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.1), transparent 40%);
+    box-shadow:
+      inset 0 0 2.5rem rgba(0, 0, 0, 0.55),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  .card:hover .crt,
+  .card:focus-within .crt {
+    filter: none;
+  }
+  /* corner brackets on the active card */
+  .card::before,
+  .card::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--muted);
+    border-style: solid;
+    opacity: 0;
+    transition: opacity 180ms;
+    pointer-events: none;
+  }
+  .card::before {
+    top: -6px;
+    left: -6px;
+    border-width: 1px 0 0 1px;
+  }
+  .card::after {
+    bottom: -6px;
+    right: -6px;
+    border-width: 0 1px 1px 0;
+  }
+  .card:hover::before,
+  .card:hover::after,
+  .card:focus-within::before,
+  .card:focus-within::after {
+    opacity: 1;
+  }
+  .info {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    display: grid;
+    place-items: center;
+    font-size: 0.6rem;
+    background: rgba(0, 0, 0, 0.75);
+    color: var(--text);
+    border-radius: 2px;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 180ms;
+  }
+  .card:hover .info,
+  .card:focus-within .info {
+    opacity: 1;
+  }
+
+  /* ---------- project sheet ---------- */
+  .sheet {
+    width: min(30rem, calc(100vw - 2rem));
+    background: var(--bg-raised);
+    color: var(--text);
+    border: 1px solid var(--line);
+    padding: 1.75rem;
+  }
+  .sheet::backdrop {
+    background: rgba(10, 10, 9, 0.7);
+    backdrop-filter: blur(2px);
+  }
+  .sheet h3 {
+    margin: 0.2rem 0 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .sheet p {
+    color: #b8b3aa;
+  }
+  .sheet-role {
+    margin: 0;
+    font-size: 0.6875rem;
+    color: var(--muted) !important;
+    text-transform: uppercase;
+  }
+  .chips {
+    list-style: none;
+    margin: 1rem 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.6875rem;
+  }
+  .chips li {
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    color: var(--muted);
+  }
+  .close {
+    margin-top: 0.5rem;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0;
+  }
+  .close:hover {
+    color: var(--text);
+  }
+
+  /* ---------- small screens: normal scrolling page ---------- */
+  @media (max-width: 56rem) {
+    .top {
+      grid-template-columns: 1fr;
+    }
+    .marks {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .dots {
+      display: none;
+    }
+    .card {
+      width: 72vw;
+    }
+    .work {
+      margin-top: 1.5rem;
+    }
+  }
+  @media (max-width: 30rem) {
+    .where {
+      margin-left: 0;
+    }
+    .mark-name {
+      font-size: 0.7rem;
+    }
+  }
+</style>
