@@ -47,7 +47,9 @@ After the summer we opened a private beta. That beta is now nearing its end, and
 
 We're a small, dedicated team. Right now the job is keeping the momentum.
 
-[MARTIN: one concrete moment from the build. A bug, a hard call, or a number, like how long it takes now to go from describing a job to a finished quote.]
+At this stage of the beta it's mostly polish and small bug fixes, and the iterations are fast.
+
+This is just the beginning. The backlog is long. We're here to create the future of quoting and invoicing for skilled trades businesses.
 
 Less paperwork. More paid work. That's the whole pitch.
 
