@@ -29,7 +29,7 @@ And the admin isn't small. A [survey of UK tradespeople this summer](https://www
 
 Five hours a week is most of a working day. Every week. On top of the actual work.
 
-Tradespeople have already started using AI for this. In ServiceTitan's [survey of 1,017 US contractors](https://www.servicetitan.com/press/servicetitan-report-finds-contractors-shifting-focus-from-ai-adoption-to-implementation-and-productivity), two in three of those using AI save at least three hours a week.
+Tradespeople have already started using AI for this. In ServiceTitan's [survey of 1,017 US contractors](https://www.servicetitan.com/press/servicetitan-report-finds-contractors-shifting-focus-from-ai-adoption-to-implementation-and-productivity), two in three of those using AI save at least three hours a week. (Most of these surveys come from companies that sell software to the trades, so take them as signals, not gospel.)
 
 The same survey had a number that stuck with me more. Only 11 percent of contractors place high trust in their AI tools. 58 percent trust them little or not at all.
 
@@ -54,13 +54,3 @@ This is just the beginning. The backlog is long. We're here to create the future
 Less paperwork. More paid work. That's the whole pitch.
 
 If you're a tradesperson in Sweden and want to try it, it's at [tradesnaphq.com](https://tradesnaphq.com/). If you think I've got any of this wrong, tell me: [martin@martinpring.com](mailto:martin@martinpring.com).
-
----
-
-**Sources.** Most of these surveys come from companies that sell software to tradespeople, so read them as signals rather than gospel.
-
-- Installatörsföretagen market forecast, 100 electrical installation firms in Sweden. Reported by [Arbetet](https://arbetet.se/2026/10/06/installatorsforetagens-prognos-svart-for-foretagen-att-hitta-personal/), October 2026.
-- Arbetsförmedlingen, [Arbetsmarknadsutsikterna våren 2026](https://arbetsformedlingen.se/download/18.7e15201e19e42865f1b3546/1781533279047/arbetsmarknadsutsikterna-varen-2026.pdf), June 2026, page 22.
-- Powered Now and Installer, *The NOW Report 2026*, 140 UK tradespeople. Reported by [Installer](https://www.installeronline.co.uk/news/93-of-uk-tradespeople-say-running-their-business-is-stressing-them-out-new-national-report-finds/), July 2026.
-- plancraft, 1,026 trade businesses in Germany and Austria. Reported by [Handwerksblatt](https://www.handwerksblatt.de/betriebsfuehrung/umfrage-von-plancraft-jeder-dritte-handwerker-nutzt-bereits-taeglich-ki), August 2026.
-- ServiceTitan, *2026 State of AI in the Trades*, 1,017 US contractors surveyed by Thrive Analytics. [Press release](https://www.servicetitan.com/press/servicetitan-report-finds-contractors-shifting-focus-from-ai-adoption-to-implementation-and-productivity), September 2026.
