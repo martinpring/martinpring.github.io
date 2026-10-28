@@ -4,10 +4,10 @@ import Doc from '../../layouts/Doc.astro';
 import { getEntries, byYear, SOURCE_LABEL, type Entry } from '../../lib/timeline';
 
 const entries = await getEntries();
-// Posts are shown in full on the timeline, so render their Markdown here.
+// Posts and roles are shown in full on the timeline, so render their Markdown here.
 const rendered = new Map<string, Awaited<ReturnType<typeof render>>['Content']>();
 for (const e of entries) {
-  if (e.data.kind === 'post') rendered.set(e.id, (await render(e)).Content);
+  if (e.data.kind === 'post' || e.data.kind === 'role') rendered.set(e.id, (await render(e)).Content);
 }
 const years = byYear(entries);
 const count = (k: Entry['data']['kind']) => entries.filter((e) => e.data.kind === k).length;
@@ -16,9 +16,18 @@ const filters = [
   { key: 'story', label: 'stories', n: count('story') },
   { key: 'post', label: 'posts', n: count('post') },
   { key: 'milestone', label: 'milestones', n: count('milestone') },
+  { key: 'role', label: 'work', n: count('role') },
 ].filter((f) => f.key === 'all' || f.n > 0);
 
 const day = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short' });
+const monthOnly = new Intl.DateTimeFormat('en-GB', { month: 'short' });
+const monthYear = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' });
+const stamp = (d: Entry['data']) => (d.precision === 'month' ? monthOnly : day).format(d.date);
+const range = (d: Entry['data']) => {
+  const from = monthYear.format(d.date);
+  if (!d.end) return from;
+  return `${from} – ${d.end === 'present' ? 'present' : monthYear.format(d.end)}`;
+};
 const isDev = import.meta.env.DEV;
 ---
 
@@ -55,7 +64,7 @@ const isDev = import.meta.env.DEV;
                     <li id={e.id} class={`entry kind-${d.kind}`} data-kind={d.kind}>
                       <span class="node" aria-hidden="true" />
                       <time class="mono" datetime={d.date.toISOString()}>
-                        {day.format(d.date)}
+                        {stamp(d)}
                         {isDev && d.draft && <em> draft</em>}
                       </time>
 
@@ -72,6 +81,17 @@ const isDev = import.meta.env.DEV;
                         <div class="body">
                           <p class="milestone-title">{d.title}</p>
                           {d.description && <p>{d.description}</p>}
+                        </div>
+                      )}
+
+                      {d.kind === 'role' && (
+                        <div class="body role">
+                          <p class="role-title">{d.title}</p>
+                          <p class="role-meta mono">
+                            {range(d)}
+                            {d.place && <span> · {d.place}</span>}
+                          </p>
+                          {Content && <Content />}
                         </div>
                       )}
 
@@ -216,6 +236,11 @@ const isDev = import.meta.env.DEV;
     background: var(--text);
     border-color: var(--text);
   }
+  .kind-role .node {
+    border-radius: 0;
+    background: var(--bg);
+    border-color: var(--muted);
+  }
   .kind-milestone .node {
     border-radius: 0;
     transform: rotate(45deg) scale(1.15);
@@ -251,6 +276,18 @@ const isDev = import.meta.env.DEV;
   }
   .story-title:hover {
     text-decoration: underline;
+  }
+  .role-title {
+    color: var(--text);
+    margin-bottom: 0.15rem !important;
+  }
+  .role-meta {
+    font-size: 0.6875rem;
+    color: var(--faint);
+    margin-bottom: 0.6rem !important;
+  }
+  .role :global(p) {
+    font-size: 0.8125rem;
   }
   .milestone-title {
     color: var(--accent);
