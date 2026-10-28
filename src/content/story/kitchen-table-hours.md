@@ -41,9 +41,13 @@ You describe the job in your own words, on your phone. Tradesnap turns it into l
 
 Nothing goes out that you haven't seen.
 
-I wrote most of the first version on my own. [MARTIN: when and how. Evenings next to consulting? Weekends? One factual sentence.] After the summer my co-founder joined, and the job changed from one person shipping to two people shipping without stepping on each other.
+We built the first version through the spring. Late nights and weekends, next to the work that paid the bills.
 
-A lot of our own code is written with AI too, and we hold it to the same rule as the product: it drafts, we review. Each repo has a shared `CLAUDE.md` with our team rules, so the AI works the same way for both of us.
+After the summer we opened a private beta. That beta is now nearing its end, and we're getting ready to go live for everyone.
+
+We're a small, dedicated team. Right now the job is keeping the momentum.
+
+A lot of our own code is written with AI too, and we hold it to the same rule as the product: it drafts, we review. Each repo has a shared `CLAUDE.md` with our team rules, so the AI works the same way for all of us.
 
 [MARTIN: one concrete moment from the build. A bug, a hard call, or a number, like how long it takes now to go from describing a job to a finished quote.]
 
