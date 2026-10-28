@@ -47,8 +47,6 @@ After the summer we opened a private beta. That beta is now nearing its end, and
 
 We're a small, dedicated team. Right now the job is keeping the momentum.
 
-A lot of our own code is written with AI too, and we hold it to the same rule as the product: it drafts, we review. Each repo has a shared `CLAUDE.md` with our team rules, so the AI works the same way for all of us.
-
 [MARTIN: one concrete moment from the build. A bug, a hard call, or a number, like how long it takes now to go from describing a job to a finished quote.]
 
 Less paperwork. More paid work. That's the whole pitch.
