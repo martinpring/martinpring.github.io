@@ -1,6 +1,6 @@
 ---
-title: "Kitchen-table hours"
-description: "Why I'm building Tradesnap: Sweden is short of installers, and the ones we have spend their evenings writing quotes."
+title: "Why we're building Tradesnap"
+description: "Sweden is short of installers, and the ones we have spend their evenings writing quotes. Here's what we're doing about it."
 date: 2026-10-28
 draft: true
 ---
