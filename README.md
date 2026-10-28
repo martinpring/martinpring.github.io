@@ -28,20 +28,56 @@ npm run build    # static output in dist/
 Put the image in `public/images/work/` (4:3 works best, e.g. 1200×900) and add
 `image: '/images/work/<file>'` to that project in `src/projects.ts`. It replaces the drawn screen.
 
-## Writing a story
+## The /story timeline
 
-Add a Markdown file to `src/content/story/`:
+`/story` is a timeline of the journey, newest first and grouped by year. Every entry is a
+Markdown file in `src/content/story/` (subfolders are fine), with one of three kinds:
+
+| `kind` | Use it for | Shows as |
+|---|---|---|
+| `story` (default) | Long-form writing | Title and description on the timeline, full text on `/story/<file-name>` |
+| `post` | Short moments, copied LinkedIn or Instagram posts | Full text (and image) on the timeline, "via LinkedIn ↗" link back |
+| `milestone` | One-line markers: a launch, a first customer, a hire | Highlighted line with a diamond marker |
 
 ```md
 ---
-title: "Title"
-description: "One sentence for the list, RSS and link previews."
+kind: post                 # story | post | milestone
+title: "Optional for posts"
+description: "Required for stories"
 date: 2026-10-27
-draft: false
+source: linkedin           # linkedin | instagram | x | site (optional)
+url: https://www.linkedin.com/feed/update/...   # link back to the original (optional)
+image: /images/story/2026-10-27-desk.jpg        # file under public/ (optional)
+imageAlt: "What the photo shows"
+draft: true                # drafts show in `npm run dev` only, never on the live site
 ---
+
+The text of the entry.
 ```
 
-Push to `master` and the site redeploys. The RSS feed is at `/rss.xml` (and `/feed.xml` for old subscribers).
+Push to `master` and the site redeploys. The RSS feed (`/rss.xml`, and `/feed.xml` for old
+subscribers) includes every kind of entry.
+
+### Importing LinkedIn and Instagram posts
+
+Both importers read the data export you download from the platform and write one **draft** per
+post, so nothing goes live until you've read it and set `draft: false`. Re-running is safe:
+existing files are left alone. Add `--since 2026-01-01` to skip older posts, or `--dry-run` to
+see what would happen.
+
+```sh
+# LinkedIn: Settings → Data privacy → Get a copy of your data → Posts. Unzip, then:
+npm run import:linkedin -- ~/Downloads/linkedin-export/Shares.csv
+
+# Instagram: Accounts Center → Your information and permissions → Download your information
+# → Posts, format JSON. Unzip, then:
+npm run import:instagram -- ~/Downloads/instagram-export
+```
+
+- LinkedIn entries link back to the original post. Their images aren't downloaded (LinkedIn's
+  media links need a login), so add your own copy under `public/images/story/` if you want one.
+- Instagram entries get their first photo copied to `public/images/story/`. Videos are skipped.
+  The export has no post links, so add `url:` yourself if you want a "via Instagram" link.
 
 ## Deploy
 
