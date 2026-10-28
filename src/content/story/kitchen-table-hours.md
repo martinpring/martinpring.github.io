@@ -9,7 +9,13 @@ You didn't learn a trade to spend your evenings at the kitchen table writing quo
 
 That's the first line on Tradesnap's website, and it's the best summary I have of why the company exists.
 
-[MARTIN: the moment you first noticed this. A friend, a relative, someone you hired for your own house? One or two sentences, what you actually saw or heard.]
+Over the past year we've talked to a lot of people in the trades. The conversation I keep coming back to was in early January, with an electrician I know.
+
+He told me all his admin happens late in the evening or at the weekend. Writing quotes. Sending them. Invoicing.
+
+So after eight to ten hours of client work, he sits down and does the business.
+
+Every business owner has some version of that. But what if those hours shrank, by a lot, every year? For someone who's already worn out after a full day of physical work, that's worth something.
 
 I've spent more than thirteen years building software for systems that can't go down. E-health services behind 1177. Middleware for Swedish public transport. Unglamorous work that nobody notices while it runs. Tradesnap is the same instinct pointed somewhere new: the paperwork that sits between a finished job and getting paid.
 
