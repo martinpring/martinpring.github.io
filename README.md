@@ -31,13 +31,14 @@ Put the image in `public/images/work/` (4:3 works best, e.g. 1200×900) and add
 ## The /story timeline
 
 `/story` is a timeline of the journey, newest first and grouped by year. Every entry is a
-Markdown file in `src/content/story/` (subfolders are fine), with one of three kinds:
+Markdown file in `src/content/story/` (subfolders are fine), with one of four kinds:
 
 | `kind` | Use it for | Shows as |
 |---|---|---|
 | `story` (default) | Long-form writing | Title and description on the timeline, full text on `/story/<file-name>` |
 | `post` | Short moments, copied LinkedIn or Instagram posts | Full text (and image) on the timeline, "via LinkedIn ↗" link back |
 | `milestone` | One-line markers: a launch, a first customer, a hire | Highlighted line with a diamond marker |
+| `role` | Jobs and positions (your LinkedIn experience lives in `src/content/story/work/`) | Title, date range and place, plus the description. Use `precision: month`, `end:` a date or `present`, and `place:` |
 
 ```md
 ---

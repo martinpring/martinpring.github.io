@@ -127,6 +127,54 @@ const last = parts.pop();
     border: 1px solid var(--line);
     filter: grayscale(0.3) brightness(0.9);
   }
+  .doc :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 2.5rem 0 1.5rem;
+  }
+  /* Markdown footnotes */
+  .doc :global(.sr-only) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .doc :global(sup) {
+    line-height: 0;
+  }
+  .doc :global(sup a) {
+    font-family: var(--mono);
+    font-size: 0.7em;
+    color: var(--accent);
+    text-decoration: none;
+    padding-left: 0.1em;
+  }
+  .doc :global(.footnotes) {
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--faint);
+  }
+  .doc :global(.footnotes ol) {
+    padding-left: 1.4rem;
+  }
+  .doc :global(.footnotes li) {
+    margin-bottom: 0.6rem;
+  }
+  .doc :global(.footnotes li::marker) {
+    font-family: var(--mono);
+    color: var(--accent);
+  }
+  .doc :global(.footnotes a) {
+    color: var(--muted);
+  }
+  .doc :global(.data-footnote-backref) {
+    text-decoration: none;
+  }
+  .doc :global(:target) {
+    scroll-margin-top: 2rem;
+  }
   .doc :global(ul),
   .doc :global(ol) {
     padding-left: 1.1rem;
