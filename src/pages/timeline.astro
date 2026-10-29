@@ -1,10 +1,10 @@
 ---
 import { render } from 'astro:content';
-import Doc from '../../layouts/Doc.astro';
-import StoryTabs from '../../components/StoryTabs.astro';
-import { getEntries, type Entry } from '../../lib/timeline';
+import Doc from '../layouts/Doc.astro';
+import { getEntries, type Entry } from '../lib/timeline';
 
 // Roles, milestones and stories, newest first, grouped by year into a grid of columns.
+// Clicking a role (or a milestone with a description) opens its details in a modal.
 const entries = (await getEntries())
   .filter((e) => e.data.kind === 'role' || e.data.kind === 'milestone' || e.data.kind === 'story')
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -33,16 +33,15 @@ const first = entries.at(-1)?.data.date.getFullYear();
 <Doc
   title="Timeline"
   description="Twenty years of work, from Fortum to Tradesnap: roles, milestones and what was written along the way."
-  path="story/timeline"
+  path="timeline"
   wide
 >
   <div class="head">
     <h1>Timeline</h1>
     <p>
-      {first ? `Today back to ${first}. ` : ''}Roles, milestones and what was written along the way. Open a line for the
+      {first ? `Today back to ${first}. ` : ''}Roles, milestones and what was written along the way. Click a line for the
       details.
     </p>
-    <StoryTabs current="timeline" />
   </div>
 
   <ol class="grid">
@@ -54,7 +53,6 @@ const first = entries.at(-1)?.data.date.getFullYear();
           <ul class="events">
             {list.map((e) => {
               const d = e.data;
-              const Body = bodies.get(e.id);
               const now = d.kind === 'role' && d.end === 'present';
               if (d.kind === 'story') {
                 return (
@@ -65,7 +63,7 @@ const first = entries.at(-1)?.data.date.getFullYear();
                   </li>
                 );
               }
-              if (d.kind === 'milestone') {
+              if (d.kind === 'milestone' && !d.description) {
                 return (
                   <li class="event kind-milestone">
                     <span>{d.title}</span>
@@ -73,23 +71,11 @@ const first = entries.at(-1)?.data.date.getFullYear();
                 );
               }
               return (
-                <li class={`event kind-role${now ? ' is-now' : ''}`}>
-                  <details>
-                    <summary>
-                      {d.title}
-                      <span class="tail">
-                        {now && <span class="now mono">now</span>}
-                        <span class="toggle mono" aria-hidden="true" />
-                      </span>
-                    </summary>
-                    <div class="more">
-                      <p class="meta mono">
-                        {range(d)}
-                        {d.place && ` · ${d.place}`}
-                      </p>
-                      {Body && <Body />}
-                    </div>
-                  </details>
+                <li class={`event kind-${d.kind}${now ? ' is-now' : ''}`}>
+                  <button class="open" type="button" data-open={e.id} aria-haspopup="dialog">
+                    {d.title}
+                    {now && <span class="now mono">now</span>}
+                  </button>
                 </li>
               );
             })}
@@ -98,7 +84,52 @@ const first = entries.at(-1)?.data.date.getFullYear();
       ))
     }
   </ol>
+
+  <dialog class="sheet" aria-label="Details">
+    {
+      entries
+        .filter((e) => e.data.kind === 'role' || (e.data.kind === 'milestone' && e.data.description))
+        .map((e) => {
+          const d = e.data;
+          const Body = bodies.get(e.id);
+          return (
+            <article data-for={e.id} hidden>
+              <p class="sheet-role mono">
+                {d.kind === 'role' ? range(d) : monthYear.format(d.date)}
+                {d.place && ` · ${d.place}`}
+              </p>
+              <h3 id={`sheet-${e.id}`}>{d.title}</h3>
+              {d.kind === 'role' && d.end === 'present' && (
+                <ul class="chips mono">
+                  <li>current</li>
+                </ul>
+              )}
+              {Body ? <Body /> : d.description && <p>{d.description}</p>}
+            </article>
+          );
+        })
+    }
+    <form method="dialog">
+      <button class="close" type="submit">[ close ]</button>
+    </form>
+  </dialog>
 </Doc>
+
+<script>
+  const sheet = document.querySelector<HTMLDialogElement>('dialog.sheet');
+  document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.open;
+      if (!sheet || !id) return;
+      sheet.querySelectorAll<HTMLElement>('article').forEach((a) => (a.hidden = a.dataset.for !== id));
+      sheet.setAttribute('aria-labelledby', `sheet-${id}`);
+      sheet.showModal();
+    });
+  });
+  sheet?.addEventListener('click', (e) => {
+    if (e.target === sheet) sheet.close();
+  });
+</script>
 
 <style>
   .head {
@@ -206,30 +237,42 @@ const first = entries.at(-1)?.data.date.getFullYear();
   .kind-story a {
     color: var(--text);
   }
-  .is-now summary {
+  .is-now .open {
     color: var(--text);
   }
 
-  details summary {
-    cursor: pointer;
-    list-style: none;
-  }
-  details summary::-webkit-details-marker {
-    display: none;
-  }
-  summary:hover {
+  /* the doc layout styles h3 for articles; give the modal title the home-page size */
+  .sheet :global(h3) {
+    margin: 0.2rem 0 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
     color: var(--text);
   }
-  .tail {
-    white-space: nowrap;
+  .sheet :global(.chips) {
+    padding-left: 0 !important;
   }
-  .toggle::before {
-    content: '+';
-    margin-left: 0.35rem;
-    color: var(--faint);
+  .sheet :global(.chips li) {
+    margin: 0 !important;
   }
-  details[open] .toggle::before {
-    content: '–';
+  .sheet :global(p) {
+    margin: 0 0 0.8em;
+  }
+  .open {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: underline dotted var(--faint);
+    text-underline-offset: 0.25em;
+  }
+  .open:hover {
+    color: var(--text);
+    text-decoration-color: var(--muted);
   }
   .now {
     margin-left: 0.35rem;
@@ -240,19 +283,5 @@ const first = entries.at(-1)?.data.date.getFullYear();
     border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
     padding: 0 0.3rem;
     vertical-align: 0.1em;
-  }
-  .more {
-    margin: 0.5rem 0 0.9rem;
-    padding-left: 0.75rem;
-    border-left: 1px solid var(--line);
-  }
-  .more :global(p) {
-    margin: 0 0 0.6em !important;
-    font-size: 0.78rem;
-    line-height: 1.55;
-  }
-  .meta {
-    font-size: 0.6875rem !important;
-    color: var(--faint);
   }
 </style>
