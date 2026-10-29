@@ -19,9 +19,11 @@ export function byYear(entries: Entry[]): [number, Entry[]][] {
   return [...map.entries()].sort((a, b) => b[0] - a[0]);
 }
 
-/** Link target for an entry: stories get their own page, everything else an anchor on the timeline. */
+/** Link target: stories get their own page, posts an anchor on /story, roles and milestones the timeline. */
 export function entryHref(e: Entry): string {
-  return e.data.kind === 'story' ? `/story/${e.id}` : `/story#${e.id}`;
+  if (e.data.kind === 'story') return `/story/${e.id}`;
+  if (e.data.kind === 'post') return `/story#${e.id}`;
+  return '/story/timeline';
 }
 
 /** A short plain-text title for feeds and lists, falling back to the first line of a post. */

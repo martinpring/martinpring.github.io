@@ -4,7 +4,8 @@ import { SITE } from '../site';
 import { getEntries, entryHref, entryTitle } from '../lib/timeline';
 
 export async function GET(context: APIContext) {
-  const entries = await getEntries();
+  // Roles are background, not news, so they stay out of the feed.
+  const entries = (await getEntries()).filter((e) => e.data.kind !== 'role');
   return rss({
     title: `${SITE.name} | Story`,
     description: 'The journey so far: building Tradesnap, Real Logic and what happens along the way.',

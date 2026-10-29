@@ -1,0 +1,258 @@
+---
+import { render } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+import StoryTabs from '../../components/StoryTabs.astro';
+import { getEntries, type Entry } from '../../lib/timeline';
+
+// Roles, milestones and stories, oldest first, grouped by year into a grid of columns.
+const entries = (await getEntries())
+  .filter((e) => e.data.kind === 'role' || e.data.kind === 'milestone' || e.data.kind === 'story')
+  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+
+const bodies = new Map<string, Awaited<ReturnType<typeof render>>['Content']>();
+for (const e of entries) {
+  if (e.data.kind === 'role' && (e.body ?? '').trim()) bodies.set(e.id, (await render(e)).Content);
+}
+
+const years = new Map<number, Entry[]>();
+for (const e of entries) {
+  const y = e.data.date.getFullYear();
+  if (!years.has(y)) years.set(y, []);
+  years.get(y)!.push(e);
+}
+
+const monthYear = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' });
+const range = (d: Entry['data']) => {
+  const from = monthYear.format(d.date);
+  if (!d.end) return from;
+  return `${from} – ${d.end === 'present' ? 'present' : monthYear.format(d.end)}`;
+};
+const first = entries[0]?.data.date.getFullYear();
+---
+
+<Doc
+  title="Timeline"
+  description="Twenty years of work, from Fortum to Tradesnap: roles, milestones and what was written along the way."
+  path="story/timeline"
+  wide
+>
+  <div class="head">
+    <h1>Timeline</h1>
+    <p>
+      {first ? `From ${first} to today. ` : ''}Roles, milestones and what was written along the way. Open a line for the
+      details.
+    </p>
+    <StoryTabs current="timeline" />
+  </div>
+
+  <ol class="grid">
+    {
+      [...years.entries()].map(([year, list]) => (
+        <li class="year">
+          <span class="dot" aria-hidden="true" />
+          <h2 class="year-label">{year}</h2>
+          <ul class="events">
+            {list.map((e) => {
+              const d = e.data;
+              const Body = bodies.get(e.id);
+              const now = d.kind === 'role' && d.end === 'present';
+              if (d.kind === 'story') {
+                return (
+                  <li class="event kind-story">
+                    <a href={`/story/${e.id}`}>
+                      Wrote: {d.title}
+                    </a>
+                  </li>
+                );
+              }
+              if (d.kind === 'milestone') {
+                return (
+                  <li class="event kind-milestone">
+                    <span>{d.title}</span>
+                  </li>
+                );
+              }
+              return (
+                <li class={`event kind-role${now ? ' is-now' : ''}`}>
+                  <details>
+                    <summary>
+                      {d.title}
+                      <span class="tail">
+                        {now && <span class="now mono">now</span>}
+                        <span class="toggle mono" aria-hidden="true" />
+                      </span>
+                    </summary>
+                    <div class="more">
+                      <p class="meta mono">
+                        {range(d)}
+                        {d.place && ` · ${d.place}`}
+                      </p>
+                      {Body && <Body />}
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
+          </ul>
+        </li>
+      ))
+    }
+  </ol>
+</Doc>
+
+<style>
+  .head {
+    max-width: 40rem;
+  }
+
+  .grid {
+    list-style: none;
+    margin: 3rem 0 0 !important;
+    padding: 0 !important;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 3.25rem;
+  }
+  @media (max-width: 64rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 34rem) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .year {
+    position: relative;
+    margin: 0 !important;
+    padding: 1.6rem 1.75rem 0 0;
+  }
+  /* the running line: from this year's dot to the next */
+  .year::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+  .year:last-child::before {
+    right: auto;
+    width: 2.5rem;
+    background: linear-gradient(90deg, var(--line), transparent);
+  }
+  .dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--muted);
+  }
+  .year:last-child .dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .year-label {
+    margin: 0 0 1rem !important;
+    font-family: var(--sans) !important;
+    font-size: clamp(1.6rem, 2.4vw, 2.1rem) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+    text-transform: none !important;
+    color: var(--text);
+    line-height: 1;
+  }
+  .year-label::before {
+    display: none; /* drop the doc-layout bullet */
+  }
+
+  .events {
+    list-style: none;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .event {
+    position: relative;
+    margin: 0 0 0.55rem !important;
+    padding-left: 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .event::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    background: var(--muted);
+  }
+  .kind-milestone::before {
+    background: var(--accent);
+    transform: rotate(45deg);
+  }
+  .kind-milestone {
+    color: var(--accent);
+  }
+  .kind-story a {
+    color: var(--text);
+  }
+  .is-now summary {
+    color: var(--text);
+  }
+
+  details summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  details summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover {
+    color: var(--text);
+  }
+  .tail {
+    white-space: nowrap;
+  }
+  .toggle::before {
+    content: '+';
+    margin-left: 0.35rem;
+    color: var(--faint);
+  }
+  details[open] .toggle::before {
+    content: '–';
+  }
+  .now {
+    margin-left: 0.35rem;
+    font-size: 0.5625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    padding: 0 0.3rem;
+    vertical-align: 0.1em;
+  }
+  .more {
+    margin: 0.5rem 0 0.9rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--line);
+  }
+  .more :global(p) {
+    margin: 0 0 0.6em !important;
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+  .meta {
+    font-size: 0.6875rem !important;
+    color: var(--faint);
+  }
+</style>

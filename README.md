@@ -19,7 +19,7 @@ npm run build    # static output in dist/
 | Work strip items and logo-grid tiles | `src/projects.ts` |
 | Drawn placeholder screens for the work strip | `src/components/Screen.astro` |
 | Privacy page | `src/pages/privacy.astro` |
-| Stories (blog posts) | `src/content/story/*.md`, served at `/story/<file-name>` |
+| Stories, posts, milestones and roles | `src/content/story/**/*.md`; views in `src/pages/story/` |
 | Global styles and colour tokens | `src/styles/global.css` |
 | Static files (favicons, `CNAME`, images) | `public/` |
 
@@ -30,8 +30,13 @@ Put the image in `public/images/work/` (4:3 works best, e.g. 1200×900) and add
 
 ## The /story timeline
 
-`/story` is a timeline of the journey, newest first and grouped by year. Every entry is a
-Markdown file in `src/content/story/` (subfolders are fine), with one of four kinds:
+`/story` has two views:
+
+- **`/story`**: stories and posts, newest first, in a vertical list grouped by year.
+- **`/story/timeline`**: roles, milestones and stories, oldest first, as a grid of years. Role
+  descriptions open on click.
+
+Every entry is a Markdown file in `src/content/story/` (subfolders are fine), with one of four kinds:
 
 | `kind` | Use it for | Shows as |
 |---|---|---|
@@ -57,7 +62,7 @@ The text of the entry.
 ```
 
 Push to `master` and the site redeploys. The RSS feed (`/rss.xml`, and `/feed.xml` for old
-subscribers) includes every kind of entry.
+subscribers) includes stories, posts and milestones, but not roles.
 
 ### Importing LinkedIn and Instagram posts
 

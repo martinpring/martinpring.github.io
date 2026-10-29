@@ -1,0 +1,41 @@
+---
+// Switch between the two views under /story.
+interface Props {
+  current: 'stories' | 'timeline';
+}
+const { current } = Astro.props;
+const tabs = [
+  { key: 'stories', label: 'stories', href: '/story' },
+  { key: 'timeline', label: 'timeline', href: '/story/timeline' },
+];
+---
+
+<nav class="tabs mono" aria-label="Story views">
+  {
+    tabs.map((t) => (
+      <a href={t.href} aria-current={t.key === current ? 'page' : undefined}>
+        {t.label}
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin: 1.5rem 0 0;
+  }
+  a {
+    border: 1px solid var(--line);
+    color: var(--muted) !important;
+    text-decoration: none;
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.7rem;
+  }
+  a:hover,
+  a[aria-current='page'] {
+    color: var(--text) !important;
+    border-color: var(--muted);
+  }
+</style>
