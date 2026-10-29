@@ -33,7 +33,7 @@ Put the image in `public/images/work/` (4:3 works best, e.g. 1200×900) and add
 `/story` has two views:
 
 - **`/story`**: stories and posts, newest first, in a vertical list grouped by year.
-- **`/story/timeline`**: roles, milestones and stories, oldest first, as a grid of years. Role
+- **`/story/timeline`**: roles, milestones and stories, newest first, as a grid of years. Role
   descriptions open on click.
 
 Every entry is a Markdown file in `src/content/story/` (subfolders are fine), with one of four kinds:

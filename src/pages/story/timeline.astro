@@ -4,10 +4,10 @@ import Doc from '../../layouts/Doc.astro';
 import StoryTabs from '../../components/StoryTabs.astro';
 import { getEntries, type Entry } from '../../lib/timeline';
 
-// Roles, milestones and stories, oldest first, grouped by year into a grid of columns.
+// Roles, milestones and stories, newest first, grouped by year into a grid of columns.
 const entries = (await getEntries())
   .filter((e) => e.data.kind === 'role' || e.data.kind === 'milestone' || e.data.kind === 'story')
-  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const bodies = new Map<string, Awaited<ReturnType<typeof render>>['Content']>();
 for (const e of entries) {
@@ -27,7 +27,7 @@ const range = (d: Entry['data']) => {
   if (!d.end) return from;
   return `${from} – ${d.end === 'present' ? 'present' : monthYear.format(d.end)}`;
 };
-const first = entries[0]?.data.date.getFullYear();
+const first = entries.at(-1)?.data.date.getFullYear();
 ---
 
 <Doc
@@ -39,7 +39,7 @@ const first = entries[0]?.data.date.getFullYear();
   <div class="head">
     <h1>Timeline</h1>
     <p>
-      {first ? `From ${first} to today. ` : ''}Roles, milestones and what was written along the way. Open a line for the
+      {first ? `Today back to ${first}. ` : ''}Roles, milestones and what was written along the way. Open a line for the
       details.
     </p>
     <StoryTabs current="timeline" />
@@ -154,7 +154,7 @@ const first = entries[0]?.data.date.getFullYear();
     background: var(--bg);
     border: 1px solid var(--muted);
   }
-  .year:last-child .dot {
+  .year:first-child .dot {
     background: var(--accent);
     border-color: var(--accent);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
