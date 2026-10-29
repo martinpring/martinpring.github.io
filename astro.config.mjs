@@ -10,5 +10,7 @@ export default defineConfig({
     // Old Jekyll permalinks (/:year/:title/)
     '/2020/how-to-set-up-a-jekyll-blog-and-host-it-on-github': '/story',
     '/about': '/',
+    // The timeline lived under /story for a day
+    '/story/timeline': '/timeline',
   },
 });

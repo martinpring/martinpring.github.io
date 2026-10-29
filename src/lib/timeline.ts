@@ -23,7 +23,7 @@ export function byYear(entries: Entry[]): [number, Entry[]][] {
 export function entryHref(e: Entry): string {
   if (e.data.kind === 'story') return `/story/${e.id}`;
   if (e.data.kind === 'post') return `/story#${e.id}`;
-  return '/story/timeline';
+  return '/timeline';
 }
 
 /** A short plain-text title for feeds and lists, falling back to the first line of a post. */

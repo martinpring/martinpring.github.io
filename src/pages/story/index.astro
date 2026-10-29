@@ -1,10 +1,9 @@
 ---
 import { render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
-import StoryTabs from '../../components/StoryTabs.astro';
 import { getEntries, byYear, SOURCE_LABEL } from '../../lib/timeline';
 
-// Stories and short posts, newest first. Roles and milestones live on /story/timeline.
+// Stories and short posts, newest first. Roles and milestones live on /timeline.
 const entries = (await getEntries()).filter((e) => e.data.kind === 'story' || e.data.kind === 'post');
 const rendered = new Map<string, Awaited<ReturnType<typeof render>>['Content']>();
 for (const e of entries) {
@@ -18,7 +17,6 @@ const isDev = import.meta.env.DEV;
 <Doc title="Story" description="Writing from the journey: building Tradesnap, Real Logic and what happens along the way." path="story">
   <h1>Story</h1>
   <p>Writing from the journey: building Tradesnap, Real Logic and what happens along the way. Newest first.</p>
-  <StoryTabs current="stories" />
 
   {
     entries.length === 0 ? (

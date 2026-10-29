@@ -19,7 +19,7 @@ npm run build    # static output in dist/
 | Work strip items and logo-grid tiles | `src/projects.ts` |
 | Drawn placeholder screens for the work strip | `src/components/Screen.astro` |
 | Privacy page | `src/pages/privacy.astro` |
-| Stories, posts, milestones and roles | `src/content/story/**/*.md`; views in `src/pages/story/` |
+| Stories, posts, milestones and roles | `src/content/story/**/*.md`; pages `src/pages/story/` and `src/pages/timeline.astro` |
 | Global styles and colour tokens | `src/styles/global.css` |
 | Static files (favicons, `CNAME`, images) | `public/` |
 
@@ -28,13 +28,13 @@ npm run build    # static output in dist/
 Put the image in `public/images/work/` (4:3 works best, e.g. 1200×900) and add
 `image: '/images/work/<file>'` to that project in `src/projects.ts`. It replaces the drawn screen.
 
-## The /story timeline
+## Story and timeline
 
-`/story` has two views:
+Two pages read from the same content:
 
 - **`/story`**: stories and posts, newest first, in a vertical list grouped by year.
-- **`/story/timeline`**: roles, milestones and stories, newest first, as a grid of years. Role
-  descriptions open on click.
+- **`/timeline`**: roles, milestones and stories, newest first, as a grid of years. Clicking a
+  role opens its details in a modal.
 
 Every entry is a Markdown file in `src/content/story/` (subfolders are fine), with one of four kinds:
 
