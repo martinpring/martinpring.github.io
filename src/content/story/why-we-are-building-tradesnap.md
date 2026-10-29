@@ -1,8 +1,8 @@
 ---
 title: "Why we're building Tradesnap"
 description: "Sweden is short of installers, and the ones we have spend their evenings writing quotes. Here's what we're doing about it."
-date: 2026-10-28
-draft: true
+date: 2026-10-29
+draft: false
 ---
 
 You didn't learn a trade to spend your evenings at the kitchen table writing quotes.

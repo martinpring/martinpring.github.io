@@ -8,15 +8,17 @@ interface Props {
   path: string; // e.g. 'story/my-post'
   type?: 'website' | 'article';
   published?: Date;
+  /** Use the full page width (e.g. for the timeline grid). */
+  wide?: boolean;
 }
-const { title, description, path, type, published } = Astro.props;
+const { title, description, path, type, published, wide = false } = Astro.props;
 const parts = path.split('/');
 const last = parts.pop();
 ---
 
 <Base title={title} description={description} type={type} published={published}>
   <div class="frame" aria-hidden="true"></div>
-  <main id="main" class="doc">
+  <main id="main" class:list={["doc", { wide }]}>
     <nav class="crumbs mono" aria-label="Breadcrumb">
       <a href="/">← back to index</a>
       <span class="path" aria-hidden="true">~/{parts.map((p) => `${p}/`)}<b>{last}</b></span>
@@ -32,6 +34,9 @@ const last = parts.pop();
     border-left: 1px solid var(--line-soft);
     border-right: 1px solid var(--line-soft);
     pointer-events: none;
+  }
+  .doc.wide {
+    max-width: 76rem;
   }
   .doc {
     max-width: 40rem;
