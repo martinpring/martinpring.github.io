@@ -43,13 +43,9 @@ Nothing goes out that you haven't seen.
 
 We built the first version through the spring. Late nights and weekends, next to the work that paid the bills.
 
-After the summer we opened a private beta. That beta is now nearing its end, and we're getting ready to go live for everyone.
+After the summer we opened a private beta. It's nearing its end now: mostly polish and small bug fixes, and the iterations are fast. We're getting ready to go live for everyone.
 
-We're a small, dedicated team. Right now the job is keeping the momentum.
-
-At this stage of the beta it's mostly polish and small bug fixes, and the iterations are fast.
-
-This is just the beginning. The backlog is long. We're here to create the future of quoting and invoicing for skilled trades businesses.
+We're a small, dedicated team, and right now the job is keeping the momentum. This is just the beginning. The backlog is long. We're here to create the future of quoting and invoicing for skilled trades businesses.
 
 Less paperwork. More paid work. That's the whole pitch.
 
